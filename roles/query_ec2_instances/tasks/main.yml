@@ -1,0 +1,28 @@
+---
+#
+# Play to query EC2 instances
+#
+#
+
+- name: List EC2 instances
+  shell: |
+    /usr/bin/python /root/ec2.py --list
+  args:
+    executable: /bin/bash
+  environment:
+    AWS_ACCESS_KEY_ID: "{{aws_access_key}}"
+    AWS_SECRET_ACCESS_KEY: "{{aws_secret_key}}"
+    EC2_INSTANCE_FILTERS: "tag:Name=Test_instance"
+  become: true
+  become_method: sudo
+  register: query_result
+  tags:
+    - query_ec2_instances
+
+- name: Print query result
+  debug:
+    msg: "{{query_result.stdout}}"
+
+- name: Print host IP address
+  debug:
+    msg: "{{query_result.stdout|json_query('_meta.hostvars')}}"

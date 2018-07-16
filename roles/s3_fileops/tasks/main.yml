@@ -1,0 +1,22 @@
+---
+#
+# Play to perform file operations on AWS S3 bucket
+#
+#
+# Tags:
+# s3_upload, s3_download
+
+- name: Upload JDK 1.8.0_172 to AWS S3 bucket
+  aws_s3:
+    aws_access_key: "{{aws_access_key}}"
+    aws_secret_key: "{{aws_secret_key}}"
+    bucket: rdurvasula-3rdparty
+    object: "/java/jdk-8u172-linux-x64.rpm"
+    src: "/root/jdk-8u172-linux-x64.rpm"
+    mode: put
+    region: "{{region}}"
+    metadata: "Content-Type=application/octet-stream"
+  become: true
+  become_method: sudo
+  tags:
+    - s3_upload

@@ -1,0 +1,89 @@
+---
+#
+# Play to launch EC2 instances
+#
+# Parameters:
+# ec2_operation = 'launch_instance|release_instance'
+# instance_name = <any character>
+- name: Provision EC2 instance
+  ec2:
+    key_name: sing_keypair4
+    group: basic-wildfly
+    instance_type: t2.micro
+    image: "{{ ami_id }}"
+    region: "{{region}}"
+    wait: true
+    exact_count: 1
+    count_tag:
+      Name: Test
+    instance_tags:
+      Name: "{{instance_name}}"
+  register: ec2_instance
+  become: true
+  become_method: sudo
+  when:
+    - ec2_operation is defined
+    - ec2_operation == "launch_instance"
+  tags:
+    - ec2_operations
+
+#- name: Print instance details
+#  debug:
+#    msg: "{{ec2_instance}}"
+
+- name: Save ec2_instance by name
+  copy:
+    content: "{{ec2_instance | to_nice_json}}"
+    dest: "files/ec2_instance.{{instance_name}}.json"
+  delegate_to: localhost
+  when:
+    - ec2_operation is defined
+    - ec2_operation == "launch_instance"
+  tags:
+    - ec2_operations
+
+- name: Extract Public IP address of instance
+  set_fact:
+    public_ip_addr: "{{ec2_instance|json_query('instances[0].public_ip')}}"
+  when:
+    - ec2_operation is defined
+    - ec2_operation == "launch_instance"
+
+- name: Print ec2_instance JSON
+  debug:
+    msg: "Public IP address: {{public_ip_addr}}"
+  when:
+    - ec2_operation is defined
+    - ec2_operation == "launch_instance"
+
+- name: Set fact for instance file name
+  set_fact:
+    ec2_instance_file_name: 'ec2_instance.{{instance_name}}.json'
+
+- name: Load EC2 instance details
+  set_fact:
+    ec2_instance: "{{lookup('file',ec2_instance_file_name) | from_json}}"
+  when:
+    - ec2_operation is defined
+    - ec2_operation == "release_instance"
+
+- name: Print EC2 instance ID
+  block:
+    - set_fact:
+        ec2_instance_id: "{{ec2_instance|json_query('instances[0].id')}}"
+    - debug:
+        msg: "EC2 Instance ID for {{instance_name}} is: {{ec2_instance_id}}"
+  when:
+    - ec2_operation is defined
+    - ec2_operation == "release_instance"
+
+- name: Deprovision EC2 instance
+  ec2:
+    state: absent
+    instance_ids: "{{ec2_instance_id}}"
+  when:
+    - ec2_operation is defined
+    - ec2_operation == "release_instance"
+  tags:
+    - ec2_operations
+

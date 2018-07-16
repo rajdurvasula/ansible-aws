@@ -1,0 +1,24 @@
+---
+#
+# Play to install pre-requisite packages
+#
+#
+#
+
+- name: Install packages for AWS EC2 client access
+  yum:
+    name: python-pip
+    state: present
+  become: true
+  become_method: sudo
+  tags:
+    - install_packages
+
+- name: Install boto packages
+  pip:
+    name: boto
+    state: present
+  become: true
+  become_method: sudo
+  tags:
+    - install_packages
