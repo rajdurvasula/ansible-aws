@@ -7,7 +7,14 @@ pipeline {
         AWS_SECRET_ACCESS_KEY = credentials('AWS_SECRET_ACCESS_KEY')
       }
       steps {
-        /bin/bash ansible-playbook ec2_site.yml -e ec2_operations=launch_instance -e instance_name=Springboot_Test
+        wrap([$class: 'AnsiColorBuildWrapper', colorMapName: "xterm"]) {
+          ansiblePlaybook(
+            playbook: 'ec2_site.yml'
+            colorized: true
+            disableHostKeyChecking: true
+            dynamicInventory: true
+            extras: '-e ec2_operation=launch_instance -e instance_name=Springboot_Test1')
+        }
       }
     }
   }
