@@ -1,13 +1,11 @@
 pipeline {
   agent any
   stages {
-    stage ('Set env') {
+    stage('Print Env Vars') {
       environment {
         AWS_ACCESS_KEY_ID = credentials('AWS_ACCESS_KEY_ID')
         AWS_SECRET_ACCESS_KEY = credentials('AWS_SECRET_ACCESS_KEY')
       }
-    }
-    stage('Print Message') {
       steps {
         sh 'echo "Hello"'
         sh 'echo "AWS_ACCESS_KEY_ID = $AWS_ACCESS_KEY_ID"'
