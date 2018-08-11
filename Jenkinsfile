@@ -1,13 +1,11 @@
 pipeline {
   agent any
+  environment {
+    AWS_ACCESS_KEY_ID = credentials('AWS_ACCESS_KEY_ID')
+    AWS_SECRET_ACCESS_KEY = credentials('AWS_SECRET_ACCESS_KEY')
+    ROOT_PWD = credentials('root_password_of_this_vm')
+  }
   stages {
-    stage('Print Env Vars') {
-      environment {
-        AWS_ACCESS_KEY_ID = credentials('AWS_ACCESS_KEY_ID')
-        AWS_SECRET_ACCESS_KEY = credentials('AWS_SECRET_ACCESS_KEY')
-        ROOT_PWD = credentials('root_password_of_this_vm')
-      }
-    }
     stage('Run Ansible') {
       steps {
         ansiblePlaybook(
