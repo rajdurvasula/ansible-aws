@@ -1,9 +1,20 @@
 pipeline {
   agent any
   stages {
-    stage('Launch EC2 node') {
+    stage('Get AWS Access Key') {
       steps {
-        ansiblePlaybook(playbook: 'ec2_site.yml', disableHostKeyChecking: true, dynamicInventory: true, extras: '-e ec2_operation=launch_instance -e instance_name=Springboot_Test1 -e ansible_become_method=sudo -e ansible_become_pass=passw0rd --connection=local')
+        input(message: 'AWS access key', id: 'aws_access_key_id')
+      }
+    }
+    stage('Get AWS Secret Key') {
+      steps {
+        input(message: 'AWS secret key', id: 'aws_secret_key')
+      }
+    }
+    stage('Print keys') {
+      steps {
+        sh '''echo "AWS Secret Key = ${aws_secret_key}"
+echo "AWS Access Key = ${aws_access_key}"'''
       }
     }
   }
