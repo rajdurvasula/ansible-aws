@@ -9,12 +9,14 @@ pipeline {
       }
     }
     stage('Run Ansible') {
-      ansiblePlaybook(
-        playbook: 'ec2_site.yml',
-        colorized: true,
-        disableHostKeyChecking: true,
-        dynamicInventory: true,
-        extras: '-e ec2_operation=launch_instance -e instance_name=Springboot_Test1 -e ansible_become_pass=$ROOT_PWD')
+      steps {
+        ansiblePlaybook(
+          playbook: 'ec2_site.yml',
+          colorized: true,
+          disableHostKeyChecking: true,
+          dynamicInventory: true,
+          extras: '-e ec2_operation=launch_instance -e instance_name=Springboot_Test1 -e ansible_become_pass=$ROOT_PWD')
+      }
     }
   }
 }
