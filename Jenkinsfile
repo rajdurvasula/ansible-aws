@@ -7,9 +7,7 @@ pipeline {
         AWS_SECRET_ACCESS_KEY = credentials('AWS_SECRET_ACCESS_KEY')
       }
       steps {
-        sh 'echo "Hello"'
-        sh 'echo "AWS_ACCESS_KEY_ID = $AWS_ACCESS_KEY_ID"'
-        sh 'echo "AWS_SECRET_ACCESS_KEY = $AWS_SECRET_ACCESS_KEY"'
+        /bin/bash ansible-playbook ec2_site.yml -e ec2_operations=launch_instance -e instance_name=Springboot_Test
       }
     }
   }
