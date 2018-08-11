@@ -1,0 +1,19 @@
+---
+#
+# Playbook to setup application on EC2 instances
+#
+#
+
+- name: Playbook to setup application on EC2 instances
+  hosts: tag_Name_Springboot_Test1
+  vars_files:
+    - vars/maven.yml
+
+  pre_tasks:
+    - name: Wait for connection
+      wait_for_connection:
+        delay: 10
+      delegate_to: localhost 
+
+  roles:
+    - { role: springboot_prereqs, }

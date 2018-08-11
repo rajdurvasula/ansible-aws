@@ -54,26 +54,15 @@
   tags:
     - springboot_prereqs
 
-# Better to download from AWS S3, need to upload to S3 bucket
-#- name: Download Oracle JDK (Oracle Site)
-#  shell: |
-#    wget --no-cookies --no-check-certificate --header "Cookie: gpw_e24=http%3A%2F%2Fwww.oracle.com%2F; oraclelicense=accept-securebackup-cookie" "http://download.oracle.com/otn-pub/java/jdk/8u172-b11/a58eab1ec242421181065cdc37240b08/jdk-8u172-linux-x64.rpm?AuthParam=1531631611_7446f47cad90f7cad585f8b27968320e"
-#  args:
-#    executable: /bin/bash
-#  become: true
-#  become_method: sudo
-#  tags:
-#    - springboot_prereqs
-
 - name: Download Oracle JDK 1.8 (AWS S3)
   aws_s3:
     aws_access_key: "{{aws_access_key}}"
-    aws_secret_key: "{{aws_secret_key}}"
+    aws_secret_key: "{{aws_secret_key}}" 
+    region: "{{aws_region}}"
     bucket: rdurvasula-3rdparty
     object: "/java/jdk-8u172-linux-x64.rpm"
     dest: "{{downloads}}/jdk-8u172-linux-x64.rpm"
     mode: get
-    region: "{{region}}"
     metadata: "Content-Type=application/octet-stream"
   become: true
   become_method: sudo
@@ -99,4 +88,11 @@
   become_method: sudo
   tags:
     - springboot_prereqs
+
+- name: Include install_maven role
+  include_role:
+    name: install_maven
+  tags:
+    - springboot_prereqs
+
 

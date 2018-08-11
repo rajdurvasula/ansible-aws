@@ -1,0 +1,81 @@
+---
+#
+# Play to install Apache maven
+#
+# Positional arguments:
+#
+# Tags:
+# install_maven
+#
+
+- name: Download Apache Maven
+  get_url:
+    url: "{{apache_maven_url}}"
+    dest: "{{downloads}}/{{apache_maven_tar}}"
+  become: true
+  become_method: sudo
+  tags:
+    - install_maven
+
+- name: Extract {{apache_maven_tar}}
+  unarchive:
+    src: "{{downloads}}/{{apache_maven_tar}}"
+    dest: "/opt"
+  become: true
+  become_method: sudo
+  tags:
+    - install_maven
+
+- name: Create link {{apache_maven_link}}
+  file:
+    path: "/opt/{{apache_maven_dir}}"
+    dest: "/opt/{{apache_maven_link}}"
+    state: link
+  become: true
+  become_method: sudo
+  tags:
+    - install_maven
+
+- name: Create maven script
+  file:
+    content: "export M2_HOME=/opt/{{apache_maven_link}}"
+    dest: /etc/profile.d/maven.sh
+    mode: 'u+rwx'
+  become: true
+  become_method: sudo
+  tags:
+    - install_maven
+
+- name: Append PATH to maven.sh
+  lineinfile:
+    path: /etc/profile.d/maven.sh
+    line: "export PATH=$PATH:$M2_HOME/bin"
+    insertafter: EOF
+  become: true
+  become_method: sudo
+  tags:
+    - install_maven
+
+- name: Append source statements for maven.sh
+  lineinfile:
+    path: "{{item}}"
+    line: "source /etc/profile.d/maven.sh"
+    insertafter: EOF
+  become: true
+  become_method: sudo
+  with_items:
+    - /root/.bashrc
+    - /etc/profile
+  tags:
+    - install_maven
+
+- name: Create maven repo directory
+  file:
+    path: "/root/.m2"
+    state: directory
+    recurse: yes
+  become: true
+  become_method: sudo
+  tags:
+    - install_maven
+
