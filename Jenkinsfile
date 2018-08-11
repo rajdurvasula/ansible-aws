@@ -8,7 +8,7 @@ pipeline {
         ROOT_PWD = credentials('root_password_of_this_vm')
       }
     }
-    steps {
+    stage('Run Ansible') {
       ansiblePlaybook(
         playbook: 'ec2_site.yml',
         colorized: true,
