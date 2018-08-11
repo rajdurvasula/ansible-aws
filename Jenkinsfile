@@ -7,9 +7,15 @@ pipeline {
         AWS_SECRET_ACCESS_KEY = credentials('AWS_SECRET_ACCESS_KEY')
         ROOT_PWD = credentials('root_password_of_this_vm')
       }
+    }
+    stage('Print vars') {
       steps {
-          sh set + x \
-            echo "ROOT_PWD = $ROOT_PW"
+        sh 'set +x'
+        sh 'echo "ROOT_PWD = $ROOTPWD"'
+      }
+    }
+    stage('Ansible') {  
+      steps {
           ansiblePlaybook(
             playbook: 'ec2_site.yml',
             colorized: true,
