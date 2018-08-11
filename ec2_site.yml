@@ -6,7 +6,7 @@
 
 - name: Playbook to launch resources on EC2
   hosts: localhost
-  connection: local
+  become: true
   vars_files:
     - vars/aws.yml
 
