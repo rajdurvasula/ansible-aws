@@ -8,6 +8,8 @@ pipeline {
         ROOT_PWD = credentials('root_password_of_this_vm')
       }
       steps {
+          sh set + x \
+            echo "ROOT_PWD = $ROOT_PW"
           ansiblePlaybook(
             playbook: 'ec2_site.yml',
             colorized: true,
