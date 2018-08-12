@@ -5,6 +5,11 @@ pipeline {
     AWS_SECRET_ACCESS_KEY = credentials('AWS_SECRET_ACCESS_KEY')
   }
   stages {
+    stage('Print Env Vars') {
+      steps {
+        sh 'echo "AWS_ACCESS_KEY_ID = $AWS_ACCESS_KEY_ID"'
+      }
+    }
     stage('Run Ansible') {
       steps {
         ansiblePlaybook(
