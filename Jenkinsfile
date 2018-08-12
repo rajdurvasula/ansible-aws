@@ -14,10 +14,11 @@ pipeline {
       steps {
         ansiblePlaybook(
           playbook: 'ec2_site.yml',
+          credentialsId: 'root_key_of_this_vm'
           colorized: true,
           disableHostKeyChecking: true,
           dynamicInventory: true,
-          extras: '--private-key=/var/lib/jenkins/.ssh/root_id_rsa -e aws_access_key=$AWS_ACCESS_KEY_ID -e aws_secret_key=$AWS_SECRET_ACCESS_KEY -e ec2_operation=launch_instance -e instance_name=Springboot_Test1')
+          extras: '-e aws_access_key=$AWS_ACCESS_KEY_ID -e aws_secret_key=$AWS_SECRET_ACCESS_KEY -e ec2_operation=launch_instance -e instance_name=Springboot_Test1')
       }
     }
   }
