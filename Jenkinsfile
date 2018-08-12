@@ -9,10 +9,11 @@ pipeline {
       steps {
         ansiblePlaybook(
           playbook: 'ec2_site.yml',
+          credentialsId: 'ff031d8b-4531-4e5c-8b76-4755e236d00c',
           colorized: true,
           disableHostKeyChecking: true,
           dynamicInventory: true,
-          extras: '-e aws_access_key=$AWS_ACCESS_KEY_ID -e aws_secret_key=$AWS_SECRET_ACCESS_KEY -e ec2_operation=launch_instance -e instance_name=Springboot_Test1 -e ansible_ssh_user=root -e ansible_become_user=root -e ansible_become_pass=passw0rd')
+          extras: '-e aws_access_key=$AWS_ACCESS_KEY_ID -e aws_secret_key=$AWS_SECRET_ACCESS_KEY -e ec2_operation=launch_instance -e instance_name=Springboot_Test1')
       }
     }
   }
