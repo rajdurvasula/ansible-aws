@@ -1,0 +1,5 @@
+maven_url: http://www-us.apache.org/dist/maven/maven-3
+maven_uri: 3.5.4/binaries/apache-maven-3.5.4-bin.tar.gz
+zip_file: apache-maven-3.5.4-bin.tar.gz
+maven_dir: apache-maven-3.5.4
+maven_link: maven

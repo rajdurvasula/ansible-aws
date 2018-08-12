@@ -100,3 +100,68 @@
   tags:
     - springboot_prereqs
 
+- name: Install maven
+  get_url:
+    url: "{{maven.maven_url}}/{{maven.maven_uri}}"
+    dest: "/root/{{maven.zip_file}}"
+  become: true
+  become_method: sudo
+  tags:
+    - springboot_prereqs
+
+- name: Extract maven tar
+  unarchive:
+    src: "/root/{{maven.zip_file}}"
+    dest: "/opt/"
+    remote_src: yes
+  become: true
+  become_method: sudo
+  tags:
+    - springboot_prereqs
+
+- name: Create link for maven
+  file:
+    path: "/opt/{{maven.maven_dir}}"
+    dest: "/opt/{{maven.maven_link}"
+    state: link
+  become: true
+  become_method: sudo
+  tags:
+    - springboot_prereqs
+
+- name: Create m2_profile file
+  file:
+    path: "/etc/profile.dm2_profile"
+    state: present
+    mode: "u+rwx"
+  become: true
+  become_method: sudo
+  tags:
+    - springboot_prereqs
+
+- name: Set environment variables for maven
+  lineinfile:
+    path: "/etc/profile.d/m2_profile"
+    line: "{{item}}"
+    insertafter: EOF
+  become: true
+  become_method: sudo
+  with_items:
+    - "export M2_HOME=/opt/{{maven.maven_link}}"
+    - "export PATH=${PATH}:${M2_HOME}/bin"
+  tags:
+    - springboot_prereqs
+
+- name: Update profiles
+  lineinfile:
+    path: "{{item}}"
+    line: "source /etc/profile.d/m2_profile"
+    insertafter: EOF
+  become: true
+  become_method: sudo
+  with_items:
+    - "/etc/profile"
+    - "/root/.bashrc"
+  tags:
+    - springboot_prereqs
+

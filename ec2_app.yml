@@ -1,0 +1,18 @@
+---
+#
+# Playbook to setup Springboot sample application
+#
+# Positional arguments:
+#
+# Tags:
+#
+#
+
+- name: Playbook to setup Springboot sample application
+  hosts: all
+  vars_files:
+    - vars/aws.yml
+
+  roles:
+    - { role: springboot_prereqs, }
+

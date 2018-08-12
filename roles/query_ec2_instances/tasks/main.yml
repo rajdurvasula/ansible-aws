@@ -2,6 +2,11 @@
 #
 # Play to query EC2 instances
 #
+# Positional arguments:
+# aws_access_key, aws_secret_key, instance_name
+# 
+# Tags:
+# query_ec2_instances
 #
 
 - name: List EC2 instances
@@ -12,7 +17,7 @@
   environment:
     AWS_ACCESS_KEY_ID: "{{aws_access_key}}"
     AWS_SECRET_ACCESS_KEY: "{{aws_secret_key}}"
-    EC2_INSTANCE_FILTERS: "tag:Name=Test_instance"
+    EC2_INSTANCE_FILTERS: "tag:Name={{instance_name}}"
   become: true
   become_method: sudo
   register: query_result
