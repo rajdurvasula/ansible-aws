@@ -36,6 +36,8 @@
     content: "{{ec2_instance | to_nice_json}}"
     dest: "files/ec2_instance.{{instance_name}}.json"
   delegate_to: localhost
+  become: true
+  become_method: sudo
   when:
     - ec2_operation is defined
     - ec2_operation == "launch_instance"
@@ -45,27 +47,43 @@
 - name: Extract Public IP address of instance
   set_fact:
     public_ip_addr: "{{ec2_instance|json_query('instances[0].public_ip')}}"
+  become: true
+  become_method: sudo
   when:
     - ec2_operation is defined
     - ec2_operation == "launch_instance"
+  tags:
+    - ec2_operations
 
 - name: Print ec2_instance JSON
   debug:
     msg: "Public IP address: {{public_ip_addr}}"
+  become: true
+  become_method: sudo
   when:
     - ec2_operation is defined
     - ec2_operation == "launch_instance"
+  tags:
+    - ec2_operations
 
 - name: Set fact for instance file name
   set_fact:
     ec2_instance_file_name: 'ec2_instance.{{instance_name}}.json'
+  become: true
+  become_method: sudo
+  tags:
+    - ec2_operations
 
 - name: Load EC2 instance details
   set_fact:
     ec2_instance: "{{lookup('file',ec2_instance_file_name) | from_json}}"
+  become: true
+  become_method: sudo
   when:
     - ec2_operation is defined
     - ec2_operation == "release_instance"
+  tags:
+    - ec2_operations
 
 - name: Print EC2 instance ID
   block:
@@ -73,14 +91,20 @@
         ec2_instance_id: "{{ec2_instance|json_query('instances[0].id')}}"
     - debug:
         msg: "EC2 Instance ID for {{instance_name}} is: {{ec2_instance_id}}"
+  become: true
+  become_method: sudo
   when:
     - ec2_operation is defined
     - ec2_operation == "release_instance"
+  tags:
+    - ec2_operations
 
 - name: Deprovision EC2 instance
   ec2:
     state: absent
     instance_ids: "{{ec2_instance_id}}"
+  become: true
+  become_method: sudo
   when:
     - ec2_operation is defined
     - ec2_operation == "release_instance"
