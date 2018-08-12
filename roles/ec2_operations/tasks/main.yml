@@ -27,15 +27,14 @@
   tags:
     - ec2_operations
 
-#- name: Print instance details
-#  debug:
-#    msg: "{{ec2_instance}}"
+- name: Print instance details
+  debug:
+    msg: "{{ec2_instance}}"
 
 - name: Save ec2_instance by name
   copy:
     content: "{{ec2_instance | to_nice_json}}"
     dest: "files/ec2_instance.{{instance_name}}.json"
-  delegate_to: localhost
   become: true
   become_method: sudo
   when:
