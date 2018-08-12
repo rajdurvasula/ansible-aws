@@ -27,9 +27,21 @@
   tags:
     - ec2_operations
 
-- name: Print instance details
-  debug:
-    msg: "{{ec2_instance}}"
+#- name: Print instance details
+#  debug:
+#    msg: "{{ec2_instance}}"
+
+- name: Touch ec2_instance.{{instance_name}}.json
+  file:
+    path: "files/ec2_instance.{{instance_name}}.json"
+    state: touch
+  become: true
+  become_method: sudo
+  when:
+    - ec2_operation is defined
+    - ec2_operation == "launch_instance"
+  tags:
+    - ec2_operations
 
 - name: Save ec2_instance by name
   copy:
