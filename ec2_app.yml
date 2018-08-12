@@ -9,7 +9,7 @@
 #
 
 - name: Playbook to setup Springboot sample application
-  hosts: {{instance_name}}
+  hosts: "{{instance_name}}"
   vars_files:
     - vars/aws.yml
 
