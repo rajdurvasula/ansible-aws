@@ -9,7 +9,7 @@ pipeline {
       steps {
         ansiblePlaybook(
           playbook: 'ec2_site.yml',
-          credentialsId: 'ff031d8b-4531-4e5c-8b76-4755e236d00c',
+          credentialsId: 'root_key_of_this_vm',
           colorized: true,
           disableHostKeyChecking: true,
           dynamicInventory: true,
