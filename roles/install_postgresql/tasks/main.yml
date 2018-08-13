@@ -5,30 +5,37 @@
 #
 #
 
-- name: Install PostgreSQL repo
-  yum:
-    name: https://download.postgresql.org/pub/repos/yum/9.6/redhat/rhel-7-x86_64/pgdg-centos96-9.6-3.noarch.rpm
-    state: present
+- name: Download PostgreSQL rpms from S3
+  aws_s3:
+    aws_access_key: "{{aws_access_key}}"
+    aws_secret_key: "{{aws_secret_key}}"
+    bucket: rdurvasula-3rdparty
+    object: "/postgres/{{item}}"
+    src: "/root/{{item}}"
+    mode: get
+    region: "{{region}}"
+    metadata: "Content-Type=application/octet-stream"
   become: true
   become_method: sudo
-  tags:
-    - install_postgres
-
-- name: Install PostgreSQL client packages
-  yum:
-    name: postgresql96
-    state: present
-  become: true
-  become_method: sudo
+  with_items:
+    - postgresql96-contrib-9.6.10-1PGDG.rhel7.x86_64.rpm
+    - postgresql96-libs-9.6.10-1PGDG.rhel7.x86_64.rpm
+    - postgresql96-9.6.10-1PGDG.rhel7.x86_64.rpm
+    - postgresql96-server-9.6.10-1PGDG.rhel7.x86_64.rpm
   tags:
     - install_postgres
 
 - name: Install PostgreSQL server packages
   yum:
-    name: postgresql96-server
+    name: "{{item}}"
     state: present
   become: true
   become_method: sudo
+  with_items:
+    - postgresql96-libs-9.6.10-1PGDG.rhel7.x86_64.rpm
+    - postgresql96-9.6.10-1PGDG.rhel7.x86_64.rpm
+    - postgresql96-server-9.6.10-1PGDG.rhel7.x86_64.rpm
+    - postgresql96-contrib-9.6.10-1PGDG.rhel7.x86_64.rpm
   tags:
     - install_postgres
 
