@@ -122,7 +122,7 @@
 - name: Create link for maven
   file:
     path: "/opt/{{maven_dir}}"
-    dest: "/opt/{{maven_link}"
+    dest: "/opt/{{maven_link}}"
     state: link
   become: true
   become_method: sudo
