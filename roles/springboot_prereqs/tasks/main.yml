@@ -139,9 +139,9 @@
     - springboot_prereqs
 
 - name: Create m2_profile file
-  file:
+  shell: |
     path: "/etc/profile.d/m2_profile"
-    state: file
+    state: touch
     mode: "u+rwx"
   become: true
   become_method: sudo
