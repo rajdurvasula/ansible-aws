@@ -17,6 +17,7 @@ pipeline {
       }
     }
     stage('Prepare Environment') {
+      input('Is the target VM ready ?')
       steps {
         ansiblePlaybook(
           playbook: 'ec2_app.yml',
