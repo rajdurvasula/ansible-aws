@@ -18,11 +18,6 @@ pipeline {
     }
     stage('Prepare Environment') {
       steps {
-        def ec2_instance = readJSON file: 'files/ec2_instance.Springboot_Test1.json'
-        sh 'echo "ec2_instance = $ec2_instance"'
-      }
-      steps {
-
         ansiblePlaybook(
           playbook: 'ec2_app.yml',
           colorized: true,
