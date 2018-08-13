@@ -14,12 +14,6 @@
     - vars/aws.yml
 
   pre_tasks:
-    - name: Set env for AWS EC2
-      environment:
-        AWS_DEFAULT_REGION: "{{ec2_region}}"
-      delegate_to: localhost
-      become: true
-      become_method: sudo
 
     - name: Wait for connection
       wait_for_connection:

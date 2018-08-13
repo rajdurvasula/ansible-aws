@@ -24,7 +24,7 @@ pipeline {
           disableHostKeyChecking: true,
           credentialsId: 'ec2-user',
           dynamicInventory: true,
-          extras: '-i ec2.py -e aws_access_key=$AWS_ACCESS_KEY_ID -e aws_secret_key=$AWS_SECRET_ACCESS_KEY -e ec2_region=ap-southeast-1')
+          extras: '-i ec2.py -e aws_access_key=$AWS_ACCESS_KEY_ID -e aws_secret_key=$AWS_SECRET_ACCESS_KEY')
       }
     }
   }
