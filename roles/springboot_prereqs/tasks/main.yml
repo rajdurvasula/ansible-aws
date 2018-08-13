@@ -102,8 +102,8 @@
 
 - name: Install maven
   get_url:
-    url: "{{maven.maven_url}}/{{maven.maven_uri}}"
-    dest: "/root/{{maven.zip_file}}"
+    url: "{{maven_url}}/{{maven_uri}}"
+    dest: "/root/{{zip_file}}"
   become: true
   become_method: sudo
   tags:
@@ -111,7 +111,7 @@
 
 - name: Extract maven tar
   unarchive:
-    src: "/root/{{maven.zip_file}}"
+    src: "/root/{{zip_file}}"
     dest: "/opt/"
     remote_src: yes
   become: true
@@ -121,8 +121,8 @@
 
 - name: Create link for maven
   file:
-    path: "/opt/{{maven.maven_dir}}"
-    dest: "/opt/{{maven.maven_link}"
+    path: "/opt/{{maven_dir}}"
+    dest: "/opt/{{maven_link}"
     state: link
   become: true
   become_method: sudo
@@ -147,7 +147,7 @@
   become: true
   become_method: sudo
   with_items:
-    - "export M2_HOME=/opt/{{maven.maven_link}}"
+    - "export M2_HOME=/opt/{{maven_link}}"
     - "export PATH=${PATH}:${M2_HOME}/bin"
   tags:
     - springboot_prereqs
