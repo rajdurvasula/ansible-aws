@@ -1,0 +1,68 @@
+---
+#
+# Play to checkout Springboot application from git and run
+#
+# Positional arguments:
+#
+# Tags:
+# install_app
+#
+
+- name: Checkout application
+  git:
+    repo: git@github.com:rajdurvasula/rdurvasula-addrbook.git
+    key_file: /root/.ssh/git_mykey1_id_rsa
+    dest: /home/ec2-user/
+  tags:
+    - install_app
+
+- name: Build application
+  shell: |
+    cd /home/ec2-user/rdurvasula-addrbook
+    mvn clean package
+  args:
+    executable: /bin/bash
+  become: true
+  become_method: sudo
+  tags:
+    - install_app
+
+- name: Set ownership to ec2-user
+  file:
+    path: /home/ec2-user
+    owner: "ec2-user"
+    group: "ec2-user"
+    recurse: yes
+  become: true
+  become_method: sudo
+  tags:
+    - install_app
+
+- name: Copy application database script
+  template:
+    src: app_db.sql
+    dest: /var/lib/pgsql/app_db.sql
+    owner: "{{postgres_user}}"
+    group: "{{postgres_group}}"
+  become: true
+  become_method: sudo
+  tags:
+    - install_app
+
+- name: Create application database
+  shell: |
+    /usr/pgsql-9.6/bin/psql -f /var/lib/pgsql/app_db.sql
+  args:
+    executable: /bin/bash
+  become: true
+  become_user: "{{postgres_user}}"
+  tags:
+    - install_app
+
+- name: Start application
+  shell: |
+    java -jar /home/ec2-user/rdurvasula-addrbook/target/MyAddressBook-0.0.1-RELEASE.jar --app.dbhost=localhost
+  args:
+    executable: /bin/bash
+  tags:
+    - install_app

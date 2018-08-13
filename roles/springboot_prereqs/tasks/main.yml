@@ -44,6 +44,15 @@
   tags:
     - springboot_prereqs
 
+- name: Install git
+  yum:
+    name: git
+    state: present
+  become: true
+  become_method: sudo
+  tags:
+    - springboot_prereqs
+
 - name: Make {{downloads}} directory
   file:
     path: "{{downloads}}"
@@ -121,7 +130,7 @@
 
 - name: Create link for maven
   file:
-    path: "/opt/{{maven_dir}}"
+    src: "/opt/{{maven_dir}}"
     dest: "/opt/{{maven_link}}"
     state: link
   become: true

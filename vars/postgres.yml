@@ -1,0 +1,5 @@
+postgres_user: postgres
+postgres_group: postgres
+postgres_password: postgres
+postgres_home: /var/lib/pgsql
+postgres_bin_home: /usr/pgsql-9.6/bin

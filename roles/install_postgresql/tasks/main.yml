@@ -1,0 +1,102 @@
+---
+#
+# Play to install application packages
+#
+#
+#
+
+- name: Install PostgreSQL repo
+  yum:
+    name: https://download.postgresql.org/pub/repos/yum/9.6/redhat/rhel-7-x86_64/pgdg-centos96-9.6-3.noarch.rpm
+    state: present
+  become: true
+  become_method: sudo
+  tags:
+    - install_postgres
+
+- name: Install PostgreSQL client packages
+  yum:
+    name: postgresql96
+    state: present
+  become: true
+  become_method: sudo
+  tags:
+    - install_postgres
+
+- name: Install PostgreSQL server packages
+  yum:
+    name: postgresql96-server
+    state: present
+  become: true
+  become_method: sudo
+  tags:
+    - install_postgres
+
+- name: Initialize PostgreSQL Database
+  shell: |
+    /usr/pgsql-9.6/bin/postgresql96-setup initdb
+  args:
+    executable: /bin/bash
+  become: true
+  become_user: "{{postgres_user}}"
+  tags:
+    - install_postgres
+
+- name: Enable PostgreSQL service
+  systemd:
+    name: postgresql-9.6
+    daemon_reload: yes
+    enabled: yes
+  become: true
+  become_method: sudo
+  tags:
+    - install_postgres
+
+- name: Start PostgreSQL service
+  systemd:
+    name: postgresql-9.6
+    state: started
+  become: true
+  become_method: sudo
+  tags:
+    - install_postgres
+
+- name: Copy postgres password script
+  template:
+    src: set_postgres_password.sql.j2
+    dest: /var/lib/pgsql/set_postgres_password.sql
+    owner: "{{postgres_user}}"
+    group: "{{postgres_group}}"
+  become: true
+  become_method: sudo
+  tags:
+    - install_postgres
+
+- name: Set postgres password
+  shell: |
+    /usr/pgsql-9.6/bin/psql -f /var/lib/pgsql/set_postgres_password.sql
+  args:
+    executable: /bin/bash
+  become: true
+  become_user: "{{postgres_user}}"
+  tags:
+    - install_postgres
+
+- name: Stop PostgreSQL service
+  systemd:
+    name: postgresql-9.6
+    state: stopped
+  become: true
+  become_method: sudo
+  tags:
+    - install_postgres
+
+- name: Start PostgreSQL service
+  systemd:
+    name: postgresql-9.6
+    state: started
+  become: true
+  become_method: sudo
+  tags:
+    - install_postgres
+
