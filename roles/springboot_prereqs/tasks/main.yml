@@ -139,7 +139,7 @@
     - springboot_prereqs
 
 - name: Create m2_profile file
-  shell: |
+  file:
     path: "/etc/profile.d/m2_profile"
     state: touch
     mode: "u+rwx"
