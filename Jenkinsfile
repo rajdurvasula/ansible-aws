@@ -16,8 +16,12 @@ pipeline {
           extras: '-e aws_access_key=$AWS_ACCESS_KEY_ID -e aws_secret_key=$AWS_SECRET_ACCESS_KEY -e ec2_operation=launch_instance -e instance_name=Springboot_Test1')
       }
     }
+    stage('Wait on target VM') {
+      steps {
+        input('Is the target VM ready ?')
+      }
+    }
     stage('Prepare Environment') {
-      input('Is the target VM ready ?')
       steps {
         ansiblePlaybook(
           playbook: 'ec2_app.yml',
