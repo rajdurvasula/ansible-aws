@@ -18,13 +18,16 @@ pipeline {
     }
     stage('Prepare Environment') {
       steps {
+        def ec2_instance = readJSON file: 'files/ec2_instance.Springboot_Test1.json'
+        sh 'echo "ec2_instance = $ec2_instance"'
+
         ansiblePlaybook(
           playbook: 'ec2_app.yml',
           colorized: true,
           disableHostKeyChecking: true,
           credentialsId: 'ec2-user',
           dynamicInventory: true,
-          extras: '-u ec2-user -e aws_access_key=$AWS_ACCESS_KEY_ID -e aws_secret_key=$AWS_SECRET_ACCESS_KEY')
+          extras: '-i ec2.py -e aws_access_key=$AWS_ACCESS_KEY_ID -e aws_secret_key=$AWS_SECRET_ACCESS_KEY')
       }
     }
   }

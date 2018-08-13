@@ -67,7 +67,7 @@
 
 - name: Extract Public IP address of instance
   set_fact:
-    public_ip_addr: "{{ec2_instance|json_query('instances[0].public_ip')}}"
+    guest_public_ip_addr: "{{ec2_instance|json_query('instances[0].public_ip')}}"
   become: true
   become_method: sudo
   when:
@@ -78,7 +78,7 @@
 
 - name: Print ec2_instance JSON
   debug:
-    msg: "Public IP address: {{public_ip_addr}}"
+    msg: "Public IP address: {{guest_public_ip_addr}}"
   become: true
   become_method: sudo
   when:
