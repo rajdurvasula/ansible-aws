@@ -141,7 +141,7 @@
 - name: Create m2_profile file
   file:
     path: "/etc/profile.dm2_profile"
-    state: present
+    state: file
     mode: "u+rwx"
   become: true
   become_method: sudo

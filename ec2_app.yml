@@ -24,4 +24,5 @@
 
   roles:
     - { role: springboot_prereqs, }
+    - { role: install_postgresql, }
 
