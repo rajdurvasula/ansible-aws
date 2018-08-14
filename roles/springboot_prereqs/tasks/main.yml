@@ -112,7 +112,7 @@
 - name: Install maven
   get_url:
     url: "{{maven_url}}/{{maven_uri}}"
-    dest: "/root/{{zip_file}}"
+    dest: "{{downloads}}/{{maven_zip_file}}"
   become: true
   become_method: sudo
   tags:
@@ -120,7 +120,7 @@
 
 - name: Extract maven tar
   unarchive:
-    src: "/root/{{zip_file}}"
+    src: "{{downloads}}/{{maven_zip_file}}"
     dest: "/opt/"
     remote_src: yes
   become: true
@@ -174,3 +174,14 @@
   tags:
     - springboot_prereqs
 
+- name: Cleanup working files
+  file:
+    path: "{{item}}"
+    state: absent
+  become: true
+  become_method: sudo
+  with_items:
+    - "{{downloads}}/jdk-8u172-linux-x64.rpm"
+    - "{{downloads}}/{{maven_zip_file}}"
+  tags:
+    - springboot_prereqs
