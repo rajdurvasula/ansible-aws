@@ -13,4 +13,5 @@
   roles:
     - { role: ec2_operations, when: ec2_operation == "launch_instance" or ec2_operation == "release_instance" }
     - { role: query_ec2_instances, when: ec2_operation == "query_instance" }
+#    - { role: s3_fileops, }
 

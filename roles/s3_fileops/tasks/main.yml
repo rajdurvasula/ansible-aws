@@ -20,3 +20,21 @@
   become_method: sudo
   tags:
     - s3_upload
+
+- name: Download PostgreSQL rpms from S3
+  aws_s3:
+    aws_access_key: "{{aws_access_key}}"
+    aws_secret_key: "{{aws_secret_key}}"
+    bucket: rdurvasula-3rdparty
+    object: "/postgresql/{{item}}"
+    dest: "/root/tmp2/{{item}}"
+    mode: get
+    region: "{{region}}"
+    metadata: "Content-Type=application/octet-stream"
+  become: true
+  become_method: sudo
+  with_items:
+    - postgresql96-contrib-9.6.10-1PGDG.rhel7.x86_64.rpm
+  tags:
+    - s3_download
+
