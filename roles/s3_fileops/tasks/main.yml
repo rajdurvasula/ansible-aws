@@ -21,6 +21,41 @@
   tags:
     - s3_upload
 
+- name: Upload files to AWS S3 bucket
+  aws_s3:
+    aws_access_key: "{{aws_access_key}}"
+    aws_secret_key: "{{aws_secret_key}}"
+    bucket: rdurvasula-3rdparty
+    object: "/postgresql/{{item}}"
+    src: "/root/{{item}}"
+    mode: put
+    region: "{{region}}"
+    metadata: "Content-Type=application/octet-stream"
+  become: true
+  become_method: sudo
+  with_items:
+    - postgresql96-contrib-9.6.10-1PGDG.rhel7.x86_64.rpm
+    - postgresql96-libs-9.6.10-1PGDG.rhel7.x86_64.rpm
+    - postgresql96-9.6.10-1PGDG.rhel7.x86_64.rpm
+    - postgresql96-server-9.6.10-1PGDG.rhel7.x86_64.rpm
+  tags:
+    - s3_upload
+
+- name: Upload PostgreSQL JDBC Driver jar to AWS S3 bucket
+  aws_s3:
+    aws_access_key: "{{aws_access_key}}"
+    aws_secret_key: "{{aws_secret_key}}"
+    bucket: rdurvasula-3rdparty
+    object: "/postgresql/postgresql-42.1.4.jar"
+    src: "/root/postgresql-42.1.4.jar"
+    mode: put
+    region: "{{region}}"
+    metadata: "Content-Type=application/octet-stream"
+  become: true
+  become_method: sudo
+  tags:
+    - s3_upload_jar
+
 - name: Download PostgreSQL rpms from S3
   aws_s3:
     aws_access_key: "{{aws_access_key}}"
