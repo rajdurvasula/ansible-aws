@@ -123,7 +123,7 @@
 
 - name: Set postgres password
   shell: |
-    "{{postgres_bin_home}}/psql -f {{postgres_home}}/set_postgres_password.sql"
+    psql -f "{{postgres_home}}/set_postgres_password.sql"
   args:
     executable: /bin/bash
   become: true
