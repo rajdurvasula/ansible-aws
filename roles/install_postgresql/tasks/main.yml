@@ -11,7 +11,7 @@
     aws_secret_key: "{{aws_secret_key}}"
     bucket: rdurvasula-3rdparty
     object: "/postgres/{{item}}"
-    src: "/root/{{item}}"
+    dest: "/root/{{item}}"
     mode: get
     region: "{{region}}"
     metadata: "Content-Type=application/octet-stream"
@@ -27,7 +27,7 @@
 
 - name: Install PostgreSQL server packages
   yum:
-    name: "{{item}}"
+    name: "/root/{{item}}"
     state: present
   become: true
   become_method: sudo
