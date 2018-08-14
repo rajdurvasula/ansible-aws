@@ -39,8 +39,28 @@
   tags:
     - install_postgres
 
+- name: Touch .bash_profile in postgres home
+  file:
+    path: "{{postgres_home}}/.bash_profile"
+    state: touch
+  become: true
+  become_user: "{{postgres_user}}"
+  tags:
+    - install_postgres
+
+- name: Setup PGDATA env variable
+  lineinfile:
+    path: "{{postgres_home}}/.bash_profile"
+    line: "export PGDATA={{postgres_home}}/9.6/data"
+    insertafter: EOF
+  become: true
+  become_user: "{{postgres_user}}"
+  tags:
+    - install_postgres
+
 - name: Initialize PostgreSQL Database
   shell: |
+    source "{{postgres_home}}/.bash_profile" ;
     cd "{{postgres_bin_home}}" ;
     ./initdb
   args:
