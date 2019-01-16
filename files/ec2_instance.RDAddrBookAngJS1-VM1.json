@@ -1,0 +1,89 @@
+{
+    "changed": true,
+    "failed": false,
+    "instance_ids": [
+        "i-0cfe94fd6d57cd715"
+    ],
+    "instances": [
+        {
+            "ami_launch_index": "0",
+            "architecture": "x86_64",
+            "block_device_mapping": {
+                "/dev/xvda": {
+                    "delete_on_termination": true,
+                    "status": "attached",
+                    "volume_id": "vol-0bab320228dd9e061"
+                }
+            },
+            "dns_name": "ec2-34-244-75-0.eu-west-1.compute.amazonaws.com",
+            "ebs_optimized": false,
+            "groups": {
+                "sg-04020490962bcadd7": "RDAddrBookAngJS1"
+            },
+            "hypervisor": "xen",
+            "id": "i-0cfe94fd6d57cd715",
+            "image_id": "ami-08935252a36e25f85",
+            "instance_type": "t2.micro",
+            "kernel": null,
+            "key_name": "irel_keypair1",
+            "launch_time": "2019-01-16T10:56:21.000Z",
+            "placement": "eu-west-1b",
+            "private_dns_name": "ip-172-31-4-60.eu-west-1.compute.internal",
+            "private_ip": "172.31.4.60",
+            "public_dns_name": "ec2-34-244-75-0.eu-west-1.compute.amazonaws.com",
+            "public_ip": "34.244.75.0",
+            "ramdisk": null,
+            "region": "eu-west-1",
+            "root_device_name": "/dev/xvda",
+            "root_device_type": "ebs",
+            "state": "running",
+            "state_code": 16,
+            "tags": {
+                "Name": "RDAddrBookAngJS1-VM1"
+            },
+            "tenancy": "default",
+            "virtualization_type": "hvm"
+        }
+    ],
+    "tagged_instances": [
+        {
+            "ami_launch_index": "0",
+            "architecture": "x86_64",
+            "block_device_mapping": {
+                "/dev/xvda": {
+                    "delete_on_termination": true,
+                    "status": "attached",
+                    "volume_id": "vol-0bab320228dd9e061"
+                }
+            },
+            "dns_name": "ec2-34-244-75-0.eu-west-1.compute.amazonaws.com",
+            "ebs_optimized": false,
+            "groups": {
+                "sg-04020490962bcadd7": "RDAddrBookAngJS1"
+            },
+            "hypervisor": "xen",
+            "id": "i-0cfe94fd6d57cd715",
+            "image_id": "ami-08935252a36e25f85",
+            "instance_type": "t2.micro",
+            "kernel": null,
+            "key_name": "irel_keypair1",
+            "launch_time": "2019-01-16T10:56:21.000Z",
+            "placement": "eu-west-1b",
+            "private_dns_name": "ip-172-31-4-60.eu-west-1.compute.internal",
+            "private_ip": "172.31.4.60",
+            "public_dns_name": "ec2-34-244-75-0.eu-west-1.compute.amazonaws.com",
+            "public_ip": "34.244.75.0",
+            "ramdisk": null,
+            "region": "eu-west-1",
+            "root_device_name": "/dev/xvda",
+            "root_device_type": "ebs",
+            "state": "running",
+            "state_code": 16,
+            "tags": {
+                "Name": "RDAddrBookAngJS1-VM1"
+            },
+            "tenancy": "default",
+            "virtualization_type": "hvm"
+        }
+    ]
+}

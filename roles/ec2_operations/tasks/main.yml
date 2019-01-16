@@ -5,10 +5,26 @@
 # Parameters:
 # ec2_operation = 'launch_instance|release_instance'
 # instance_name = <any character>
+
+- name: Provision EC2 group
+  ec2_group:
+    name: "{{sg_name}}"
+    description: 'Security group for {{sg_name}}'
+    vpc_id: "{{vpc_id}}"
+    region: "{{region}}"
+    rules:
+      - proto: tcp
+        from_port: 9080
+        to_port: 9080
+        cidr_ip: 171.61.71.211/32
+      - proto: tcp
+        from_port: 22
+        to_port: 22
+        cidr_ip: 171.61.71.211/32
 - name: Provision EC2 instance
   ec2:
-    key_name: sing_keypair4
-    group: basic-wildfly
+    key_name: irel_keypair1
+    group: "{{sg_name}}"
     instance_type: t2.micro
     image: "{{ ami_id }}"
     region: "{{region}}"
