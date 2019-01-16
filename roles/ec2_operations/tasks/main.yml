@@ -19,8 +19,8 @@
     instance_tags:
       Name: "{{instance_name}}"
   register: ec2_instance
-  become: true
-  become_method: sudo
+#  become: true
+#  become_method: sudo
   when:
     - ec2_operation is defined
     - ec2_operation == "launch_instance"
