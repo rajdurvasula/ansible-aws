@@ -46,5 +46,6 @@
 
   roles:
 #    - { role: test, }
-    - { role: ec2_operations, }
+    - { role: ec2_operations, when: ec2_operations is defined }
+    - { role: s3_fileops, when: s3_fileops is defined }
 

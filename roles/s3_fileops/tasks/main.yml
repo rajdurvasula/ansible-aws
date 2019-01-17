@@ -18,5 +18,8 @@
     metadata: "Content-Type=application/octet-stream"
   become: true
   become_method: sudo
+  when:
+    - s3_fileops is defined
+    - s3_fileops == "upload_binary"
   tags:
     - s3_upload
