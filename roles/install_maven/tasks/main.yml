@@ -27,17 +27,6 @@
   tags:
     - install_maven
 
-- name: Create link {{apache_maven_link}}
-  file:
-    path: "/opt/{{apache_maven_dir}}"
-    dest: "/opt/{{apache_maven_link}}"
-    state: link
-    force: yes
-  become: true
-  become_method: sudo
-  tags:
-    - install_maven
-
 - name: Touch maven script file
   file:
     path: /etc/profile.d/maven.sh
@@ -56,7 +45,7 @@
   become: true
   become_method: sudo
   with_items:
-    - "export M2_HOME=/opt/{{apache_maven_link}}" 
+    - "export M2_HOME=/opt/{{apache_maven_dir}}" 
     - "export PATH=$PATH:$M2_HOME/bin"
   tags:
     - install_maven
