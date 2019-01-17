@@ -44,7 +44,7 @@
 #        - botocore
 #        - boto3
 
-
   roles:
+#    - { role: test, }
     - { role: ec2_operations, }
 

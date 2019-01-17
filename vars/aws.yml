@@ -1,2 +1,14 @@
 region: eu-west-1
 ami_id: ami-08935252a36e25f85
+vpc:
+  name: my-vpc1
+  cidr: 172.10.0.0/16
+  subnets:
+    - cidr: 172.10.1.0/24
+      name: "Development1"
+    - cidr: 172.10.2.0/24
+      name: "Development2"
+    - cidr: 172.10.3.0/24
+      name: "Development3"
+  igw:
+    name: "Development IGW"

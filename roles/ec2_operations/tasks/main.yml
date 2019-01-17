@@ -6,11 +6,116 @@
 # ec2_operation = 'launch_instance|release_instance'
 # instance_name = <any character>
 
-- name: Provision EC2 group
+- name: Provision VPC
+  ec2_vpc_net:
+    name: "{{vpc.name}}"
+    state: present
+    cidr_block: "{{vpc.cidr}}"
+    region: "{{region}}"
+    tenancy: default
+  environment:
+    AWS_ACCESS_KEY_ID: "{{aws_access_key}}"
+    AWS_SECRET_ACCESS_KEY: "{{aws_secret_key}}"
+    tags:
+      environment: "Development"
+  tags:
+    - ec2_operations
+
+- name: Gather VPC facts
+  ec2_vpc_net_facts:
+    filters:
+      "tag:Name": "{{vpc.name}}"
+  register: vpc_details
+  environment:
+    AWS_ACCESS_KEY_ID: "{{aws_access_key}}"
+    AWS_SECRET_ACCESS_KEY: "{{aws_secret_key}}"
+  tags:
+    - ec2_operations
+
+- name: Provision VPC subnet1
+  ec2_vpc_subnet:
+    state: present
+    vpc_id: "{{vpc_details.vpcs[0].id}}"
+    cidr: "{{vpc.subnets[0].cidr}}"
+    region: "{{region}}"
+    az: "{{region}}a"
+    resource_tags:
+      Name: "{{vpc.subnets[0].name}}"
+  register: subnet1_details
+  environment:
+    AWS_ACCESS_KEY_ID: "{{aws_access_key}}"
+    AWS_SECRET_ACCESS_KEY: "{{aws_secret_key}}"
+  tags:
+    - ec2_operations
+
+- name: Provision VPC subnet2
+  ec2_vpc_subnet:
+    state: present
+    vpc_id: "{{vpc_details.vpcs[0].id}}"
+    cidr: "{{vpc.subnets[1].cidr}}"
+    region: "{{region}}"
+    az: "{{region}}b"
+    resource_tags:
+      Name: "{{vpc.subnets[1].name}}"
+  register: subnet2_details
+  environment:
+    AWS_ACCESS_KEY_ID: "{{aws_access_key}}"
+    AWS_SECRET_ACCESS_KEY: "{{aws_secret_key}}"
+  tags:
+    - ec2_operations
+
+- name: Provision VPC subnet3
+  ec2_vpc_subnet:
+    state: present
+    vpc_id: "{{vpc_details.vpcs[0].id}}"
+    cidr: "{{vpc.subnets[2].cidr}}"
+    region: "{{region}}"
+    az: "{{region}}a"
+    resource_tags:
+      Name: "{{vpc.subnets[2].name}}"
+  register: subnet3_details
+  environment:
+    AWS_ACCESS_KEY_ID: "{{aws_access_key}}"
+    AWS_SECRET_ACCESS_KEY: "{{aws_secret_key}}"
+  tags:
+    - ec2_operations
+
+- name: Provision IGW
+  ec2_vpc_igw:
+    vpc_id: "{{vpc_details.vpcs[0].id}}"
+    state: present
+    resource_tags:
+      Name: "{{vpc.igw.name}}" 
+  register: igw_details
+  environment:
+    AWS_ACCESS_KEY_ID: "{{aws_access_key}}"
+    AWS_SECRET_ACCESS_KEY: "{{aws_secret_key}}"
+  tags:
+    - ec2_operations
+
+- name: Setup RouteTable for Subnet1
+  ec2_vpc_route_table:
+    vpc_id: "{{vpc_details.vpcs[0].id}}"
+    region: "{{region}}"
+    tags:
+      Name: "Public Development1"
+    subnets:
+      - "{{subnet1_details.subnet.id}}"
+    routes:
+      - dest: 0.0.0.0/0
+        gateway_id: "{{igw_details.gateway_id}}"
+  register: subnet1_routetable_details
+  environment:
+    AWS_ACCESS_KEY_ID: "{{aws_access_key}}"
+    AWS_SECRET_ACCESS_KEY: "{{aws_secret_key}}"
+  tags:
+    - ec2_operations
+
+- name: Provision EC2 security group
   ec2_group:
     name: "{{sg_name}}"
     description: 'Security group for {{sg_name}}'
-    vpc_id: "{{vpc_id}}"
+    vpc_id: "{{vpc_details.vpcs[0].id}}"
     region: "{{region}}"
     rules:
       - proto: tcp
@@ -21,20 +126,34 @@
         from_port: 22
         to_port: 22
         cidr_ip: 171.61.71.211/32
+    tags:
+      Name: "{{sg_name}}"
+  register: sg_details
+  environment:
+    AWS_ACCESS_KEY_ID: "{{aws_access_key}}"
+    AWS_SECRET_ACCESS_KEY: "{{aws_secret_key}}"
+  tags:
+    - ec2_operations
+
 - name: Provision EC2 instance
   ec2:
     key_name: irel_keypair1
-    group: "{{sg_name}}"
+    vpc_subnet_id: "{{subnet1_details.subnet.id}}"
+    assign_public_ip: yes
+    group_id: "{{sg_details.group_id}}"
     instance_type: t2.micro
     image: "{{ ami_id }}"
     region: "{{region}}"
-    wait: true
+    wait: yes
     exact_count: 1
     count_tag:
       Name: Test
     instance_tags:
       Name: "{{instance_name}}"
   register: ec2_instance
+  environment:
+    AWS_ACCESS_KEY_ID: "{{aws_access_key}}"
+    AWS_SECRET_ACCESS_KEY: "{{aws_secret_key}}"
 #  become: true
 #  become_method: sudo
   when:
@@ -100,6 +219,9 @@
   when:
     - ec2_operation is defined
     - ec2_operation == "release_instance"
+  environment:
+    AWS_ACCESS_KEY_ID: "{{aws_access_key}}"
+    AWS_SECRET_ACCESS_KEY: "{{aws_secret_key}}"
   tags:
     - ec2_operations
 

@@ -1,0 +1,3 @@
+- name: Print subnet details
+  debug:
+    msg: "{{vpc.subnets[0].name, vpc.subnets[0].cidr}}"
