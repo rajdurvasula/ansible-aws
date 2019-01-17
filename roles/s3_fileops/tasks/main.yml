@@ -19,7 +19,7 @@
   become: true
   become_method: sudo
   when:
-    - s3_fileops is defined
-    - s3_fileops == "upload_binary"
+    - s3_fileop is defined
+    - s3_fileop == "upload_binary"
   tags:
     - s3_upload

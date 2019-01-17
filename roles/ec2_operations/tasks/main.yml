@@ -121,11 +121,11 @@
       - proto: tcp
         from_port: 9080
         to_port: 9080
-        cidr_ip: 171.61.71.211/32
+        cidr_ip: "{{my_public_ip}}/32"
       - proto: tcp
         from_port: 22
         to_port: 22
-        cidr_ip: 171.61.71.211/32
+        cidr_ip: "{{my_public_ip}}/32"
     tags:
       Name: "{{sg_name}}"
   register: sg_details
