@@ -21,6 +21,7 @@
   unarchive:
     src: "{{downloads}}/{{apache_maven_tar}}"
     dest: "/opt"
+    remote_src: yes
   become: true
   become_method: sudo
   tags:
@@ -31,28 +32,32 @@
     path: "/opt/{{apache_maven_dir}}"
     dest: "/opt/{{apache_maven_link}}"
     state: link
+    force: yes
+  become: true
+  become_method: sudo
+  tags:
+    - install_maven
+
+- name: Touch maven script file
+  file:
+    path: /etc/profile.d/maven.sh
+    mode: 'u+rwx'
+    state: touch
   become: true
   become_method: sudo
   tags:
     - install_maven
 
 - name: Create maven script
-  file:
-    content: "export M2_HOME=/opt/{{apache_maven_link}}"
-    dest: /etc/profile.d/maven.sh
-    mode: 'u+rwx'
-  become: true
-  become_method: sudo
-  tags:
-    - install_maven
-
-- name: Append PATH to maven.sh
   lineinfile:
     path: /etc/profile.d/maven.sh
-    line: "export PATH=$PATH:$M2_HOME/bin"
-    insertafter: EOF
+    line: "{{item}}"
+    insert_after: EOF
   become: true
   become_method: sudo
+  with_items:
+    - "export M2_HOME=/opt/{{apache_maven_link}}" 
+    - "export PATH=$PATH:$M2_HOME/bin"
   tags:
     - install_maven
 

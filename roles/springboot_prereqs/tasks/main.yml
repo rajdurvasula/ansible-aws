@@ -58,7 +58,7 @@
   aws_s3:
     aws_access_key: "{{aws_access_key}}"
     aws_secret_key: "{{aws_secret_key}}" 
-    region: "{{aws_region}}"
+    region: "{{region}}"
     bucket: rdurvasula-3rdparty
     object: "/java/jdk-8u172-linux-x64.rpm"
     dest: "{{downloads}}/jdk-8u172-linux-x64.rpm"
@@ -86,12 +86,6 @@
     executable: /bin/bash
   become: true
   become_method: sudo
-  tags:
-    - springboot_prereqs
-
-- name: Include install_maven role
-  include_role:
-    name: install_maven
   tags:
     - springboot_prereqs
 

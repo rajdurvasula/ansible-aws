@@ -5,9 +5,14 @@
 #
 
 - name: Playbook to setup application on EC2 instances
-  hosts: tag_Name_Springboot_Test1
+  hosts: "{{variable_host}}"
+  environment:
+    AWS_ACCESS_KEY_ID: "{{aws_access_key}}"
+    AWS_SECRET_ACCESS_KEY: "{{aws_secret_key}}"
   vars_files:
+    - vars/aws.yml
     - vars/maven.yml
+
 
   pre_tasks:
     - name: Wait for connection
@@ -17,3 +22,4 @@
 
   roles:
     - { role: springboot_prereqs, }
+    - { role: install_maven, }
