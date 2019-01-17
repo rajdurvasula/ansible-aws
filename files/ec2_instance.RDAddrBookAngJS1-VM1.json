@@ -2,7 +2,7 @@
     "changed": true,
     "failed": false,
     "instance_ids": [
-        "i-0884c915a5c601710"
+        "i-0164422afecc42951"
     ],
     "instances": [
         {
@@ -12,26 +12,26 @@
                 "/dev/xvda": {
                     "delete_on_termination": true,
                     "status": "attached",
-                    "volume_id": "vol-02ba11534e882f90b"
+                    "volume_id": "vol-07dfde65c46e8280d"
                 }
             },
-            "dns_name": "ec2-54-229-15-238.eu-west-1.compute.amazonaws.com",
+            "dns_name": "ec2-52-215-235-149.eu-west-1.compute.amazonaws.com",
             "ebs_optimized": false,
             "groups": {
-                "sg-051b155b7d31a97bd": "RDAddrBookAngJS1"
+                "sg-02d1edee657d8d5cb": "RDAddrBookAngJS1"
             },
             "hypervisor": "xen",
-            "id": "i-0884c915a5c601710",
+            "id": "i-0164422afecc42951",
             "image_id": "ami-08935252a36e25f85",
             "instance_type": "t2.micro",
             "kernel": null,
             "key_name": "irel_keypair1",
-            "launch_time": "2019-01-17T06:16:30.000Z",
+            "launch_time": "2019-01-17T16:00:11.000Z",
             "placement": "eu-west-1a",
-            "private_dns_name": "ip-172-10-1-148.eu-west-1.compute.internal",
-            "private_ip": "172.10.1.148",
-            "public_dns_name": "ec2-54-229-15-238.eu-west-1.compute.amazonaws.com",
-            "public_ip": "54.229.15.238",
+            "private_dns_name": "ip-172-10-1-165.eu-west-1.compute.internal",
+            "private_ip": "172.10.1.165",
+            "public_dns_name": "ec2-52-215-235-149.eu-west-1.compute.amazonaws.com",
+            "public_ip": "52.215.235.149",
             "ramdisk": null,
             "region": "eu-west-1",
             "root_device_name": "/dev/xvda",
@@ -53,26 +53,26 @@
                 "/dev/xvda": {
                     "delete_on_termination": true,
                     "status": "attached",
-                    "volume_id": "vol-02ba11534e882f90b"
+                    "volume_id": "vol-07dfde65c46e8280d"
                 }
             },
-            "dns_name": "ec2-54-229-15-238.eu-west-1.compute.amazonaws.com",
+            "dns_name": "ec2-52-215-235-149.eu-west-1.compute.amazonaws.com",
             "ebs_optimized": false,
             "groups": {
-                "sg-051b155b7d31a97bd": "RDAddrBookAngJS1"
+                "sg-02d1edee657d8d5cb": "RDAddrBookAngJS1"
             },
             "hypervisor": "xen",
-            "id": "i-0884c915a5c601710",
+            "id": "i-0164422afecc42951",
             "image_id": "ami-08935252a36e25f85",
             "instance_type": "t2.micro",
             "kernel": null,
             "key_name": "irel_keypair1",
-            "launch_time": "2019-01-17T06:16:30.000Z",
+            "launch_time": "2019-01-17T16:00:11.000Z",
             "placement": "eu-west-1a",
-            "private_dns_name": "ip-172-10-1-148.eu-west-1.compute.internal",
-            "private_ip": "172.10.1.148",
-            "public_dns_name": "ec2-54-229-15-238.eu-west-1.compute.amazonaws.com",
-            "public_ip": "54.229.15.238",
+            "private_dns_name": "ip-172-10-1-165.eu-west-1.compute.internal",
+            "private_ip": "172.10.1.165",
+            "public_dns_name": "ec2-52-215-235-149.eu-west-1.compute.amazonaws.com",
+            "public_ip": "52.215.235.149",
             "ramdisk": null,
             "region": "eu-west-1",
             "root_device_name": "/dev/xvda",

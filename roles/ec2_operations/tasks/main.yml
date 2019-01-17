@@ -5,21 +5,10 @@
 # Parameters:
 # ec2_operation = 'launch_instance|release_instance'
 # instance_name = <any character>
+# target_subnet_tag = subnet tag name which is attached to EC2 instance
 
-- name: Provision VPC
-  ec2_vpc_net:
-    name: "{{vpc.name}}"
-    state: present
-    cidr_block: "{{vpc.cidr}}"
-    region: "{{region}}"
-    tenancy: default
-  environment:
-    AWS_ACCESS_KEY_ID: "{{aws_access_key}}"
-    AWS_SECRET_ACCESS_KEY: "{{aws_secret_key}}"
-    tags:
-      environment: "Development"
-  tags:
-    - ec2_operations
+- name: Include Provision VPC Task
+  include_tasks: create_vpc.yml
 
 - name: Gather VPC facts
   ec2_vpc_net_facts:
@@ -30,86 +19,6 @@
     AWS_ACCESS_KEY_ID: "{{aws_access_key}}"
     AWS_SECRET_ACCESS_KEY: "{{aws_secret_key}}"
   register: vpc_details
-  tags:
-    - ec2_operations
-
-- name: Provision VPC subnet1
-  ec2_vpc_subnet:
-    state: present
-    vpc_id: "{{vpc_details.vpcs[0].id}}"
-    cidr: "{{vpc.subnets[0].cidr}}"
-    region: "{{region}}"
-    az: "{{region}}a"
-    resource_tags:
-      Name: "{{vpc.subnets[0].name}}"
-  register: subnet1_details
-  environment:
-    AWS_ACCESS_KEY_ID: "{{aws_access_key}}"
-    AWS_SECRET_ACCESS_KEY: "{{aws_secret_key}}"
-  tags:
-    - ec2_operations
-
-- name: Provision VPC subnet2
-  ec2_vpc_subnet:
-    state: present
-    vpc_id: "{{vpc_details.vpcs[0].id}}"
-    cidr: "{{vpc.subnets[1].cidr}}"
-    region: "{{region}}"
-    az: "{{region}}b"
-    resource_tags:
-      Name: "{{vpc.subnets[1].name}}"
-  register: subnet2_details
-  environment:
-    AWS_ACCESS_KEY_ID: "{{aws_access_key}}"
-    AWS_SECRET_ACCESS_KEY: "{{aws_secret_key}}"
-  tags:
-    - ec2_operations
-
-- name: Provision VPC subnet3
-  ec2_vpc_subnet:
-    state: present
-    vpc_id: "{{vpc_details.vpcs[0].id}}"
-    cidr: "{{vpc.subnets[2].cidr}}"
-    region: "{{region}}"
-    az: "{{region}}a"
-    resource_tags:
-      Name: "{{vpc.subnets[2].name}}"
-  register: subnet3_details
-  environment:
-    AWS_ACCESS_KEY_ID: "{{aws_access_key}}"
-    AWS_SECRET_ACCESS_KEY: "{{aws_secret_key}}"
-  tags:
-    - ec2_operations
-
-- name: Provision IGW
-  ec2_vpc_igw:
-    vpc_id: "{{vpc_details.vpcs[0].id}}"
-    state: present
-    region: "{{region}}"
-    resource_tags:
-      Name: "{{vpc.igw.name}}" 
-  register: igw_details
-  environment:
-    AWS_ACCESS_KEY_ID: "{{aws_access_key}}"
-    AWS_SECRET_ACCESS_KEY: "{{aws_secret_key}}"
-  tags:
-    - ec2_operations
-
-- name: Setup RouteTable for Subnet1
-  ec2_vpc_route_table:
-    vpc_id: "{{vpc_details.vpcs[0].id}}"
-    region: "{{region}}"
-    tags:
-      Name: "Public Development1"
-    subnets:
-      - "{{subnet1_details.subnet.id}}"
-    routes:
-      - dest: 0.0.0.0/0
-        gateway_id: "{{igw_details.gateway_id}}"
-  register: subnet1_routetable_details
-  environment:
-    AWS_ACCESS_KEY_ID: "{{aws_access_key}}"
-    AWS_SECRET_ACCESS_KEY: "{{aws_secret_key}}"
   tags:
     - ec2_operations
 
@@ -137,10 +46,23 @@
   tags:
     - ec2_operations
 
+- name: Get subnet details by tag
+  ec2_vpc_subnet_facts:
+    region: "{{region}}"
+    filters:
+      vpc-id: "{{vpc_details.vpcs[0].id}}"
+      "tag:Name": "{{target_subnet_tag}}"
+  environment:
+    AWS_ACCESS_KEY_ID: "{{aws_access_key}}"
+    AWS_SECRET_ACCESS_KEY: "{{aws_secret_key}}"
+  register: target_subnet_details
+  tags:
+    - ec2_operations
+  
 - name: Provision EC2 instance
   ec2:
     key_name: irel_keypair1
-    vpc_subnet_id: "{{subnet1_details.subnet.id}}"
+    vpc_subnet_id: "{{target_subnet_details.subnets[0].id}}"
     assign_public_ip: yes
     group_id: "{{sg_details.group_id}}"
     instance_type: t2.micro
