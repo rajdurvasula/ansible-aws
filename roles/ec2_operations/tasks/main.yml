@@ -26,6 +26,7 @@
     filters:
       "tag:Name": "{{vpc.name}}"
   register: vpc_details
+  region: "{{region}}"
   environment:
     AWS_ACCESS_KEY_ID: "{{aws_access_key}}"
     AWS_SECRET_ACCESS_KEY: "{{aws_secret_key}}"
@@ -84,6 +85,7 @@
   ec2_vpc_igw:
     vpc_id: "{{vpc_details.vpcs[0].id}}"
     state: present
+    region: "{{region}}"
     resource_tags:
       Name: "{{vpc.igw.name}}" 
   register: igw_details
