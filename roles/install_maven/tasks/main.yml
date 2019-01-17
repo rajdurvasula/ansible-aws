@@ -52,7 +52,7 @@
   lineinfile:
     path: /etc/profile.d/maven.sh
     line: "{{item}}"
-    insert_after: EOF
+    insertafter: EOF
   become: true
   become_method: sudo
   with_items:

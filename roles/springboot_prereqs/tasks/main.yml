@@ -33,14 +33,10 @@
 
 - name: Install Boto
   pip:
-    name: "{{item}}"
+    name: ['boto','botocore','boto3']
     state: present
   become: true
   become_method: sudo
-  with_items:
-    - boto
-    - botocore
-    - boto3
   tags:
     - springboot_prereqs
 
