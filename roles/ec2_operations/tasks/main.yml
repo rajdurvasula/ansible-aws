@@ -25,11 +25,11 @@
   ec2_vpc_net_facts:
     filters:
       "tag:Name": "{{vpc.name}}"
-  register: vpc_details
-  region: "{{region}}"
+    region: "{{region}}"
   environment:
     AWS_ACCESS_KEY_ID: "{{aws_access_key}}"
     AWS_SECRET_ACCESS_KEY: "{{aws_secret_key}}"
+  register: vpc_details
   tags:
     - ec2_operations
 
