@@ -3,6 +3,8 @@
 # Task to Create AWS EKS Cluster
 #
 # arguments:
+# my_public_ip=controller machine public ip
+# eks_cluster_name=<any string>
 #
 # tags:
 # create_eks_cluster
@@ -43,18 +45,35 @@
   tags:
     - create_eks_cluster
 
-- name: Get Subnets by tag
-  ec2_vpc_subnet_facts:
-    region: "{{region}}"
-    filters:
-      vpc-id: "{{vpc_details.vpcs[0].id}}"
-      "tag:Name": "{{target_subnet_tag}}"
-  environment:
-    AWS_ACCESS_KEY_ID: "{{aws_access_key}}"
-    AWS_SECRET_ACCESS_KEY: "{{aws_secret_key}}"
-  register: target_subnet_details
-  tags:
-    - create_eks_cluster
+- name: Include Get Subnet Task for Subnet1
+  include_tasks: ../vpc_operations/tasks/get_subnet.yml
+  vars:
+    vpc_id: "{{vpc_details.vpcs[0].id}}"
+    subnet_tag: "{{subnet1_tag}}"
+
+- name: Set fact for subnet1 id
+  set_fact:
+    subnet1_id: "{{subnet_details.subnets[0].id}}"
+
+- name: Include Get Subnet Task for Subnet2
+  include_tasks: ../vpc_operations/tasks/get_subnet.yml
+  vars:
+    vpc_id: "{{vpc_details.vpcs[0].id}}"
+    subnet_tag: "{{subnet2_tag}}"
+
+- name: Set fact for subnet2 id
+  set_fact:
+    subnet2_id: "{{subnet_details.subnets[0].id}}"
+
+- name: Include Get Subnet Task for Subnet3
+  include_tasks: ../vpc_operations/tasks/get_subnet.yml
+  vars:
+    vpc_id: "{{vpc_details.vpcs[0].id}}"
+    subnet_tag: "{{subnet3_tag}}"
+
+- name: Set fact for subnet3 id
+  set_fact:
+    subnet3_id: "{{subnet_details.subnets[0].id}}"
 
 - name: Provision EKS Cluster
   aws_eks_cluster:
@@ -62,9 +81,9 @@
     version: "{{eks.kubernetes_version}}"
     role_arn: "{{eks.service_role_arn}}"
     subnets:
-      - "{{target_subnet_details.subnets[0].id}}"
-      - "{{target_subnet_details.subnets[1].id}}"
-      - "{{target_subnet_details.subnets[2].id}}"
+      - "{{subnet1_id}}"
+      - "{{subnet2_id}}"
+      - "{{subnet3_id}}"
     security_groups:
       - "{{controlplane_sg_details.group_id}}"
   environment:

@@ -1,0 +1,25 @@
+---
+#
+# Task to get Subnet details
+#
+# arguments:
+# vpc_id=<vpc id>
+# subnet_tag=<tag value>
+#
+# tags:
+# get_subnet
+#
+
+- name: Get Subnet by tag
+  ec2_vpc_subnet_facts:
+    region: "{{region}}"
+    filters:
+      vpc-id: "{{vpc_id}}"
+      "tag:Name": "{{subnet_tag}}"
+  environment:
+    AWS_ACCESS_KEY_ID: "{{aws_access_key}}"
+    AWS_SECRET_ACCESS_KEY: "{{aws_secret_key}}"
+  register: subnet_details
+  tags:
+    - get_subnet
+
