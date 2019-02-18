@@ -1,0 +1,25 @@
+---
+#
+# Tasks for VPC operations
+#
+# arguments:
+# vpc_operation=create_vpc|release_vpc
+#
+# tags:
+# vpc_operations
+#
+
+- name: Include Task to Create VPC
+  include_tasks: create_vpc.yml
+  when:
+    - vpc_operation == "create_vpc"
+  tags:
+    - vpc_operations
+
+- name: Include Task to Release VPC
+  include_tasks: release_vpc.yml
+  when:
+    - vpc_operation == "release_vpc"
+  tags:
+    - vpc_operations
+

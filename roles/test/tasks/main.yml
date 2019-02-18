@@ -1,20 +1,16 @@
-- name: Print subnet details
-  debug:
-    msg: "{{vpc.subnets[0].name, vpc.subnets[0].cidr}}"
-
+#
 - name: Gather VPC facts
   ec2_vpc_net_facts:
     filters:
-      "tag:Name": "{{vpc.name}}"
+      "tag:Name": "{{vpc_name}}"
     region: "{{region}}"
   environment:
-    AWS_ACCESS_KEY_ID: "{{aws_access_key}}"
-    AWS_SECRET_ACCESS_KEY: "{{aws_secret_key}}"
+   AWS_ACCESS_KEY_ID: "{{aws_access_key}}"
+   AWS_SECRET_ACCESS_KEY: "{{aws_secret_key}}"
   register: vpc_details
   tags:
     - ec2_operations
 
-# arg: subnet_tag
 - name: Get subnet details by tag
   ec2_vpc_subnet_facts:
     region: "{{region}}"
@@ -31,3 +27,21 @@
 - name: Print target_subnet_details
   debug:
     msg: "{{target_subnet_details}}"
+
+- name: Print target subnet CIDR
+  debug:
+    msg: "{{target_subnet_details.subnets[0].cidr_block}}"
+
+#- name: Get EC2 instance details
+#  ec2_instance_facts:
+#    filters:
+#      "tag:Name": "{{instance_name}}"
+#  register: ec2_instance_details
+#
+#- name: Print EC2 instance details
+#  debug:
+#    msg: "{{ec2_instance_details}}"
+#
+#- name: Print EC2 instance private IP
+#  debug:
+#    msg: "{{ec2_instance_details.instances[0].private_ip_address}}"

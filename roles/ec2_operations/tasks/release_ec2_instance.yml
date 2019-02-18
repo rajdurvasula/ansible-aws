@@ -1,0 +1,43 @@
+---
+#
+# Task to release EC2 instance
+#
+# arguments:
+# instance_name = <any character>
+# sg_name = <any character> (default=instance_name)
+#
+# tags:
+# release_ec2_instance
+#
+
+- name: Get EC2 instance details
+  ec2_instance_facts:
+    filters:
+      "tag:Name": "{{instance_name}}"
+  register: ec2_instance_details
+  when:
+    - ec2_operation is defined
+    - ec2_operation == "release_instance"
+  tags:
+    - release_ec2_instance
+
+- name: Deprovision EC2 instance
+  ec2:
+    state: absent
+    instance_ids: "{{ec2_instance_details.instances[0].instance_id}}"
+  environment:
+    AWS_ACCESS_KEY_ID: "{{aws_access_key}}"
+    AWS_SECRET_ACCESS_KEY: "{{aws_secret_key}}"
+  tags:
+    - release_ec2_instance
+
+- name: Deprovision Security Groups
+  ec2_group:
+    name: "{{sg_name}}"
+    state: absent
+  environment:
+    AWS_ACCESS_KEY_ID: "{{aws_access_key}}"
+    AWS_SECRET_ACCESS_KEY: "{{aws_secret_key}}"
+  tags:
+    - release_ec2_instance
+

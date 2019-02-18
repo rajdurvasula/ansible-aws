@@ -2,146 +2,21 @@
 #
 # Play to launch EC2 instances
 #
-# Parameters:
+# Arguments:
 # ec2_operation = 'launch_instance|release_instance'
 # instance_name = <any character>
 # target_subnet_tag = subnet tag name which is attached to EC2 instance
 
-- name: Include Provision VPC Task
-  include_tasks: create_vpc.yml
+- name: Include Launch EC2 instance Task
+  include_tasks: launch_ec2_instance.yml
+  when:
+    - ec2_operation is defined
+    - ec2_operation == "launch_instance"
 
-- name: Gather VPC facts
-  ec2_vpc_net_facts:
-    filters:
-      "tag:Name": "{{vpc.name}}"
-    region: "{{region}}"
-  environment:
-    AWS_ACCESS_KEY_ID: "{{aws_access_key}}"
-    AWS_SECRET_ACCESS_KEY: "{{aws_secret_key}}"
-  register: vpc_details
-  tags:
-    - ec2_operations
-
-- name: Provision EC2 security group
-  ec2_group:
-    name: "{{sg_name}}"
-    description: 'Security group for {{sg_name}}'
-    vpc_id: "{{vpc_details.vpcs[0].id}}"
-    region: "{{region}}"
-    rules:
-      - proto: tcp
-        from_port: 22
-        to_port: 22
-        cidr_ip: "{{my_public_ip}}/32"
-    tags:
-      Name: "{{sg_name}}"
-  register: sg_details
-  environment:
-    AWS_ACCESS_KEY_ID: "{{aws_access_key}}"
-    AWS_SECRET_ACCESS_KEY: "{{aws_secret_key}}"
-  tags:
-    - ec2_operations
-
-- name: Get subnet details by tag
-  ec2_vpc_subnet_facts:
-    region: "{{region}}"
-    filters:
-      vpc-id: "{{vpc_details.vpcs[0].id}}"
-      "tag:Name": "{{target_subnet_tag}}"
-  environment:
-    AWS_ACCESS_KEY_ID: "{{aws_access_key}}"
-    AWS_SECRET_ACCESS_KEY: "{{aws_secret_key}}"
-  register: target_subnet_details
-  tags:
-    - ec2_operations
+- name: Include Release EC2 instance Task
+  include_tasks: release_ec2_instance.yml
+  when:
+    - ec2_operation is defined
+    - ec2_operation == "release_instance"
   
-- name: Provision EC2 instance
-  ec2:
-    key_name: irel_keypair1
-    vpc_subnet_id: "{{target_subnet_details.subnets[0].id}}"
-    assign_public_ip: yes
-    group_id: "{{sg_details.group_id}}"
-    instance_type: t2.micro
-    image: "{{ ami_id }}"
-    region: "{{region}}"
-    wait: yes
-    exact_count: 1
-    count_tag:
-      Name: Test
-    instance_tags:
-      Name: "{{instance_name}}"
-  register: ec2_instance
-  environment:
-    AWS_ACCESS_KEY_ID: "{{aws_access_key}}"
-    AWS_SECRET_ACCESS_KEY: "{{aws_secret_key}}"
-#  become: true
-#  become_method: sudo
-  when:
-    - ec2_operation is defined
-    - ec2_operation == "launch_instance"
-  tags:
-    - ec2_operations
-
-#- name: Print instance details
-#  debug:
-#    msg: "{{ec2_instance}}"
-
-- name: Save ec2_instance by name
-  copy:
-    content: "{{ec2_instance | to_nice_json}}"
-    dest: "files/ec2_instance.{{instance_name}}.json"
-  delegate_to: localhost
-  when:
-    - ec2_operation is defined
-    - ec2_operation == "launch_instance"
-  tags:
-    - ec2_operations
-
-- name: Extract Public IP address of instance
-  set_fact:
-    public_ip_addr: "{{ec2_instance|json_query('instances[0].public_ip')}}"
-  when:
-    - ec2_operation is defined
-    - ec2_operation == "launch_instance"
-
-- name: Print ec2_instance JSON
-  debug:
-    msg: "Public IP address: {{public_ip_addr}}"
-  when:
-    - ec2_operation is defined
-    - ec2_operation == "launch_instance"
-
-- name: Set fact for instance file name
-  set_fact:
-    ec2_instance_file_name: 'ec2_instance.{{instance_name}}.json'
-
-- name: Load EC2 instance details
-  set_fact:
-    ec2_instance: "{{lookup('file',ec2_instance_file_name) | from_json}}"
-  when:
-    - ec2_operation is defined
-    - ec2_operation == "release_instance"
-
-- name: Print EC2 instance ID
-  block:
-    - set_fact:
-        ec2_instance_id: "{{ec2_instance|json_query('instances[0].id')}}"
-    - debug:
-        msg: "EC2 Instance ID for {{instance_name}} is: {{ec2_instance_id}}"
-  when:
-    - ec2_operation is defined
-    - ec2_operation == "release_instance"
-
-- name: Deprovision EC2 instance
-  ec2:
-    state: absent
-    instance_ids: "{{ec2_instance_id}}"
-  when:
-    - ec2_operation is defined
-    - ec2_operation == "release_instance"
-  environment:
-    AWS_ACCESS_KEY_ID: "{{aws_access_key}}"
-    AWS_SECRET_ACCESS_KEY: "{{aws_secret_key}}"
-  tags:
-    - ec2_operations
 

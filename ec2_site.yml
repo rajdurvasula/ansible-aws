@@ -45,7 +45,8 @@
 #        - boto3
 
   roles:
-#    - { role: test, }
-    - { role: ec2_operations, when: ec2_operation is defined }
-    - { role: s3_fileops, when: s3_fileop is defined }
+    - { role: test, }
+    - { role: vpc_operations, when: vpc_operation is defined }
+#    - { role: ec2_operations, when: ec2_operation is defined }
+#    - { role: s3_fileops, when: s3_fileop is defined }
 

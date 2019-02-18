@@ -1,0 +1,20 @@
+---
+#
+# Task to Release VPC resources
+#
+# arguments:
+#
+# tags:
+# release_vpc
+#
+
+- name: Release VPC and associated resources
+  ec2_vpc_net:
+    name: "{{vpc.name}}"
+    state: absent
+  environment:
+    AWS_ACCESS_KEY_ID: "{{aws_access_key}}"
+    AWS_SECRET_ACCESS_KEY: "{{aws_secret_key}}"
+  tags:
+    - release_vpc
+ 

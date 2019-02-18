@@ -2,7 +2,10 @@
 #
 # Task to create VPC, igw, subnets
 #
+# arguments:
 #
+# tags:
+# create_vpc
 
 - name: Provision VPC
   ec2_vpc_net:

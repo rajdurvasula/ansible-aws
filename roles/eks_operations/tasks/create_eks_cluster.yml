@@ -1,0 +1,12 @@
+---
+#
+# Task to Create AWS EKS Cluster
+#
+# arguments:
+#
+# tags:
+#
+#
+
+- name: Include Provision VPC Task
+  include_tasks: create_vpc.yml
