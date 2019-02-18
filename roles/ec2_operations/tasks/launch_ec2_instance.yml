@@ -9,10 +9,17 @@
 # my_public_ip = controller machine's public IP address
 # target_subnet_tag = subnet tag name which is attached to EC2 instance
 #
+# tags:
+# launch_ec2_instance
+#
 
 - name: Include Provision VPC Task
   include_role:
     - name: vpc_operations
+  vars:
+    - vpc_operation: "create_vpc"
+  tags:
+    - launch_ec2_instance
 
 - name: Gather VPC facts
   ec2_vpc_net_facts:
@@ -24,7 +31,7 @@
     AWS_SECRET_ACCESS_KEY: "{{aws_secret_key}}"
   register: vpc_details
   tags:
-    - ec2_operations
+   - launch_ec2_instance
 
 - name: Provision EC2 security group
   ec2_group:
@@ -44,7 +51,7 @@
     AWS_ACCESS_KEY_ID: "{{aws_access_key}}"
     AWS_SECRET_ACCESS_KEY: "{{aws_secret_key}}"
   tags:
-    - ec2_operations
+   - launch_ec2_instance
 
 - name: Get subnet details by tag
   ec2_vpc_subnet_facts:
@@ -57,7 +64,7 @@
     AWS_SECRET_ACCESS_KEY: "{{aws_secret_key}}"
   register: target_subnet_details
   tags:
-    - ec2_operations
+   - launch_ec2_instance
 
 - name: Provision EC2 instance
   ec2:
@@ -69,7 +76,7 @@
     image: "{{ ami_id }}"
     region: "{{region}}"
     wait: yes
-    exact_count: 1
+    exect_count: 1
     count_tag:
       Name: Test
     instance_tags:
@@ -79,5 +86,5 @@
     AWS_ACCESS_KEY_ID: "{{aws_access_key}}"
     AWS_SECRET_ACCESS_KEY: "{{aws_secret_key}}"
   tags:
-    - ec2_operations
+   - launch_ec2_instance
 

@@ -5,8 +5,76 @@
 # arguments:
 #
 # tags:
-#
+# create_eks_cluster
 #
 
 - name: Include Provision VPC Task
-  include_tasks: create_vpc.yml
+  include_role:
+    - name: vpc_operations
+  vars:
+    - vpc_operation: "create_vpc"
+  tags:
+    - create_eks_cluster 
+
+- name: Gather VPC facts
+  ec2_vpc_net_facts:
+    filters:
+      "tag:Name": "{{vpc.name}}"
+    region: "{{region}}"
+  environment:
+    AWS_ACCESS_KEY_ID: "{{aws_access_key}}"
+    AWS_SECRET_ACCESS_KEY: "{{aws_secret_key}}"
+  register: vpc_details
+  tags:
+    - create_eks_cluster
+
+- name: Provision Security Group for Control Plane 
+  ec2_group:
+    name: "{{eks.control_plane.sg_name}}"
+    description: "Security Group for {{eks.control_plane.sg_name}}"
+    vpc_id: "{{vpc_details.vpcs[0].id}}"
+    region: "{{region}}"
+    tags:
+      Name: "{{eks.control_plane.sg_name}}"
+  environment:
+    AWS_ACCESS_KEY_ID: "{{aws_access_key}}"
+    AWS_SECRET_ACCESS_KEY: "{{aws_secret_key}}"
+  register: controlplane_sg_details
+  tags:
+    - create_eks_cluster
+
+- name: Get Subnets by tag
+  ec2_vpc_subnet_facts:
+    region: "{{region}}"
+    filters:
+      vpc-id: "{{vpc_details.vpcs[0].id}}"
+      "tag:Name": "{{target_subnet_tag}}"
+  environment:
+    AWS_ACCESS_KEY_ID: "{{aws_access_key}}"
+    AWS_SECRET_ACCESS_KEY: "{{aws_secret_key}}"
+  register: target_subnet_details
+  tags:
+    - create_eks_cluster
+
+- name: Provision EKS Cluster
+  aws_eks_cluster:
+    name: "{{eks_cluster_name}}"
+    version: "{{eks.kubernetes_version}}"
+    role_arn: "{{eks.service_role_arn}}"
+    subnets:
+      - "{{target_subnet_details.subnets[0].id}}"
+      - "{{target_subnet_details.subnets[1].id}}"
+      - "{{target_subnet_details.subnets[2].id}}"
+    security_groups:
+      - "{{controlplane_sg_details.group_id}}"
+  environment:
+    AWS_ACCESS_KEY_ID: "{{aws_access_key}}"
+    AWS_SECRET_ACCESS_KEY: "{{aws_secret_key}}"
+  register: eks_cluster_details
+  tags:
+    - create_eks_cluster
+
+- name: Print EKS Cluster output
+  debug:
+    msg: "{{eks_cluster_details.stdout}}"
+

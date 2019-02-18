@@ -1,0 +1,7 @@
+eks_cluster_name: "rd-eks"
+
+eks:
+  kubernetes_version: "1.11"
+  service_role_arn: arn:aws:iam::466323227181:role/rajEKSServiceRole
+  control_plane:
+    sg_name: eks-vpc-ControlPlaneSG
