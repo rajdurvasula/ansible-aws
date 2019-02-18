@@ -10,9 +10,9 @@
 
 - name: Include Provision VPC Task
   include_role:
-    - name: vpc_operations
+    name: vpc_operations
   vars:
-    - vpc_operation: "create_vpc"
+    vpc_operation: "create_vpc"
   tags:
     - create_eks_cluster 
 
