@@ -1,16 +1,23 @@
+---
+#
+# Common AWS variables
+#
+# For EKS, ECS, use RFC1918 CIDRs (10.0.0.0 / 172.16.0.0 / 192.168.0.0)
+#
+#
 region: eu-west-1
 ami_id: ami-08935252a36e25f85
 vpc:
   name: my-vpc1
-  cidr: 172.10.0.0/16
+  cidr: 10.0.0.0/16
   subnets:
-    - cidr: 172.10.1.0/24
+    - cidr: 10.10.1.0/24
       name: "Development1"
       region: "eu-west-1a"
-    - cidr: 172.10.2.0/24
+    - cidr: 10.10.2.0/24
       name: "Development2"
       region: "eu-west-1b"
-    - cidr: 172.10.3.0/24
+    - cidr: 10.10.3.0/24
       name: "Development3"
       region: "eu-west-1c"
   igw:
