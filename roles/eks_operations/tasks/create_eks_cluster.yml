@@ -95,5 +95,5 @@
 
 - name: Print EKS Cluster output
   debug:
-    msg: "{{eks_cluster_details.stdout}}"
+    msg: "{{eks_cluster_details}}"
 
