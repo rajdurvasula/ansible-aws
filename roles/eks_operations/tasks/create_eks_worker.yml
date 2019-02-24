@@ -55,6 +55,36 @@
   tags:
    - create_eks_worker
 
+- name: Include Get Subnet Task for Subnet1
+  include_tasks: ../vpc_operations/tasks/get_subnet.yml
+  vars:
+    vpc_id: "{{vpc_details.vpcs[0].id}}"
+    subnet_tag: "{{subnet1_tag}}"
+
+- name: Set fact for subnet1 id
+  set_fact:
+    subnet1_id: "{{subnet_details.subnets[0].id}}"
+
+- name: Include Get Subnet Task for Subnet2
+  include_tasks: ../vpc_operations/tasks/get_subnet.yml
+  vars:
+    vpc_id: "{{vpc_details.vpcs[0].id}}"
+    subnet_tag: "{{subnet2_tag}}"
+
+- name: Set fact for subnet2 id
+  set_fact:
+    subnet2_id: "{{subnet_details.subnets[0].id}}"
+
+- name: Include Get Subnet Task for Subnet3
+  include_tasks: ../vpc_operations/tasks/get_subnet.yml
+  vars:
+    vpc_id: "{{vpc_details.vpcs[0].id}}"
+    subnet_tag: "{{subnet3_tag}}"
+
+- name: Set fact for subnet3 id
+  set_fact:
+    subnet3_id: "{{subnet_details.subnets[0].id}}"
+
 - name: Provision EC2 security group for EKS nodegroup
   ec2_group:
     name: "{{nodegroup.sg_name}}"
