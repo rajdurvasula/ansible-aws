@@ -20,3 +20,10 @@
     - eks_operation is defined
     - eks_operation == "release_eks_cluster"
 
+- name: Include Create EKS NodeGroup Task
+  include_tasks: create_eks_worker.yml
+  when:
+    - eks_operation is defined
+    - eks_operation == "create_eks_nodegroup"
+
+

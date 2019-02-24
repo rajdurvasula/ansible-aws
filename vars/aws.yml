@@ -22,3 +22,5 @@ vpc:
       region: "eu-west-1c"
   igw:
     name: "Development IGW"
+
+key_pair_name: irel_keypair1

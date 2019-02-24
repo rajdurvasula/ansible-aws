@@ -1,0 +1,160 @@
+---
+#
+# Task to create EKS worker nodegroup
+#
+# arguments:
+# bootstrap_args
+#
+# tags:
+# create_eks_worker
+#
+
+- name: Gather VPC facts
+  ec2_vpc_net_facts:
+    filters:
+      "tag:Name": "{{vpc.name}}"
+    region: "{{region}}"
+  environment:
+    AWS_ACCESS_KEY_ID: "{{aws_access_key}}"
+    AWS_SECRET_ACCESS_KEY: "{{aws_secret_key}}"
+  register: vpc_details
+  tags:
+   - create_eks_worker
+
+- name: Provision EC2 security group for EKS nodegroup
+  ec2_group:
+    name: "{{nodegroup.sg_name}}"
+    description: 'Security group for {{eks_cluster_name}} EKS cluster nodegroup'
+    vpc_id: "{{vpc_details.vpcs[0].id}}"
+    region: "{{region}}"
+    rules:
+      - proto: tcp
+        from_port: 0
+        to_port: 65535
+        group_name: "{{nodegroup.sg_name}}"
+        rule_desc: Allow node to communicate with each other
+      - proto: tcp
+        from_port: 1025
+        to_port: 65535
+        group_name: "{{eks.control_plane.sg_name}}"
+        rule_desc: Allow worker Kubelets and pods to receive communication from the cluster control plane
+      - proto: tcp
+        from_port: 443
+        to_port: 443
+        group_name: "{{eks.control_plane.sg_name}}"
+        rule_desc: Allow pods running extension API servers on port 443 to receive communication from cluster control plane
+    tags:
+      Name: "{{nodegroup.sg_name}}"
+  register: nodegroup_sg_details
+  environment:
+    AWS_ACCESS_KEY_ID: "{{aws_access_key}}"
+    AWS_SECRET_ACCESS_KEY: "{{aws_secret_key}}"
+  tags:
+   - create_eks_worker
+
+- name: Update EKS Control Plane security group
+  ec2_group:
+    name: "{{eks.control_plane.sg_name}}"
+    description: "Security Group for {{eks.control_plane.sg_name}}" 
+    vpc_id: "{{vpc_details.vpcs[0].id}}"
+    region: "{{region}}"
+    rules:
+      - proto: tcp
+        from_port: 443
+        to_port: 443
+        group_name: "{{nodegroup.sg_name}}"
+        rule_desc: Allow pods to communicate with the cluster API Server
+    rules_egress:
+      - proto: tcp
+        from_port: 1025
+        to_port: 65535
+        group_name: "{{nodegroup.sg_name}}"
+        rule_desc: Allow the cluster control plane to communicate with worker Kubelet and pods
+      - proto: tcp
+        from_port: 443
+        to_port: 443
+        group_name: "{{nodegroup.sg_name}}"
+        rule_desc: Allow the cluster control plane to communicate with pods running extension API servers on port 443
+  environment:
+    AWS_ACCESS_KEY_ID: "{{aws_access_key}}"
+    AWS_SECRET_ACCESS_KEY: "{{aws_secret_key}}"
+  tags:
+   - create_eks_worker
+
+- name: Create IAM Role
+  iam_role:
+    name: "{{eks.iam_role}}"
+    description: IAM Role for EKS operations
+    state: present
+    assume_role_policy_document:
+      Version: "2012-10-17"
+      Statement:
+        - Effect: Allow
+          Action: 'sts:AssumeRole'
+          Principal:
+            Service: eks.amazonaws.com
+    managed_policy:
+      - 'arn:aws:iam::aws:policy/AmazonEKSClusterPolicy'
+      - 'arn:aws:iam::aws:policy/AmazonEKSServicePolicy'
+      - 'arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy'
+      - 'arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly'
+      - 'arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy'
+  environment:
+    AWS_ACCESS_KEY_ID: "{{aws_access_key}}"
+    AWS_SECRET_ACCESS_KEY: "{{aws_secret_key}}"
+  tags:
+   - create_eks_worker
+
+- name: Gather IAM Role details
+  iam_role_facts:
+    name: "{{eks.iam_role}}"
+  register: iam_role_details
+  environment:
+    AWS_ACCESS_KEY_ID: "{{aws_access_key}}"
+    AWS_SECRET_ACCESS_KEY: "{{aws_secret_key}}"
+  tags:
+   - create_eks_worker
+
+- name: Create Launch Configuration
+  ec2_lc:
+    name: "rd-eks-lc1"
+    image_id: "{{nodegroup.image_id}}"
+    key_name: "{{key_pair_name}}"
+    region: "{{region}}"
+    security_groups: [ "{{nodegroup.sg_name}}" ]
+    instance_type: "{{nodegroup.instance_type}}"
+    instance_profile_name: "{{iam_role_details.iam_roles[0].instance_profiles[0].instance_profile_name}}"
+    assign_public_ip: yes
+    volumes:
+      - device_name: /dev/xvda
+        volume_type: "{{nodegroup.volume_type}}"
+        volume_size: "{{nodegroup.volume_size}}"
+        delete_on_termination: true
+    user_data: |
+      #!/bin/bash
+      set -o xtrace
+      /etc/eks/bootstrap.sh {{eks_cluster_name}} {{bootstrap_args}}
+  environment:
+    AWS_ACCESS_KEY_ID: "{{aws_access_key}}"
+    AWS_SECRET_ACCESS_KEY: "{{aws_secret_key}}"
+  tags:
+   - create_eks_worker
+
+- name: Create AutoScalingGroup for EKS nodegroup
+  ec2_asg:
+    name: rd-eks-asg
+    launch_config_name: "rd-eks-lc1"
+    min_size: 1
+    max_size: 4
+    desired_capacity: 3
+    vpc_zone_identifier: [ "{{subnet1_id}}", "{{subnet2_id}}", "{{subnet3_id}}" ]
+    tags:
+      - environment: "{{eks_cluster_name}}-{{nodegroup.name}}-Node"
+        propagate_at_launch: yes
+  environment:
+    AWS_ACCESS_KEY_ID: "{{aws_access_key}}"
+    AWS_SECRET_ACCESS_KEY: "{{aws_secret_key}}"
+  tags:
+   - create_eks_worker
+
+

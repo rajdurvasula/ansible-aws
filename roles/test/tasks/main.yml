@@ -1,30 +1,30 @@
 #
-- name: Gather VPC facts
-  ec2_vpc_net_facts:
-    filters:
-      "tag:Name": "{{vpc.name}}"
-    region: "{{region}}"
-  environment:
-    AWS_ACCESS_KEY_ID: "{{aws_access_key}}"
-    AWS_SECRET_ACCESS_KEY: "{{aws_secret_key}}"
-  register: vpc_details
-  tags:
-    - ec2_operations
-
-- name: Print vpc details
-  debug:
-    msg: "{{vpc_details}}"
-
-- name: Include Get Subnet Task
-  include_tasks: ../vpc_operations/tasks/get_subnet.yml
-  vars:
-    vpc_id: "{{vpc_details.vpcs[0].id}}"
-    subnet_tag: "{{subnet1_tag}}"
-
-- name: Print subnet1 details
-  debug:
-    msg: "{{subnet_details}}"
-
+#- name: Gather VPC facts
+#  ec2_vpc_net_facts:
+#    filters:
+#      "tag:Name": "{{vpc.name}}"
+#    region: "{{region}}"
+#  environment:
+#    AWS_ACCESS_KEY_ID: "{{aws_access_key}}"
+#    AWS_SECRET_ACCESS_KEY: "{{aws_secret_key}}"
+#  register: vpc_details
+#  tags:
+#    - ec2_operations
+#
+#- name: Print vpc details
+#  debug:
+#    msg: "{{vpc_details}}"
+#
+#- name: Include Get Subnet Task
+#  include_tasks: ../vpc_operations/tasks/get_subnet.yml
+#  vars:
+#    vpc_id: "{{vpc_details.vpcs[0].id}}"
+#    subnet_tag: "{{subnet1_tag}}"
+#
+#- name: Print subnet1 details
+#  debug:
+#    msg: "{{subnet_details}}"
+#
 #- name: Get subnet details by tag
 #  ec2_vpc_subnet_facts:
 #    region: "{{region}}"
@@ -59,3 +59,42 @@
 #- name: Print EC2 instance private IP
 #  debug:
 #    msg: "{{ec2_instance_details.instances[0].private_ip_address}}"
+
+- name: Create IAM Role
+  iam_role:
+    name: "{{eks.iam_role}}"
+    description: IAM Role for EKS operations
+    state: present
+    assume_role_policy_document:
+      Version: "2012-10-17"
+      Statement:
+        - Effect: Allow
+          Action: 'sts:AssumeRole'
+          Principal:
+            Service: eks.amazonaws.com
+    managed_policy:
+      - 'arn:aws:iam::aws:policy/AmazonEKSClusterPolicy'
+      - 'arn:aws:iam::aws:policy/AmazonEKSServicePolicy'
+      - 'arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy'
+      - 'arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly'
+      - 'arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy'
+  environment:
+    AWS_ACCESS_KEY_ID: "{{aws_access_key}}"
+    AWS_SECRET_ACCESS_KEY: "{{aws_secret_key}}"
+  tags:
+   - create_eks_worker
+
+- name: Gather IAM Role details
+  iam_role_facts:
+    name: "{{eks.iam_role}}"
+  register: iam_role_details
+  environment:
+    AWS_ACCESS_KEY_ID: "{{aws_access_key}}"
+    AWS_SECRET_ACCESS_KEY: "{{aws_secret_key}}"
+  tags:
+   - create_eks_worker
+
+- name: Print IAM Role details
+  debug:
+    msg: "{{iam_role_details}}"
+
