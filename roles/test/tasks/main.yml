@@ -59,42 +59,58 @@
 #- name: Print EC2 instance private IP
 #  debug:
 #    msg: "{{ec2_instance_details.instances[0].private_ip_address}}"
+#
+#- name: Create IAM Role
+#  iam_role:
+#    name: "{{eks.iam_role}}"
+#    description: IAM Role for EKS operations
+#    state: present
+#    assume_role_policy_document:
+#      Version: "2012-10-17"
+#      Statement:
+#        - Effect: Allow
+#          Action: 'sts:AssumeRole'
+#          Principal:
+#            Service: eks.amazonaws.com
+#    managed_policy:
+#      - 'arn:aws:iam::aws:policy/AmazonEKSClusterPolicy'
+#      - 'arn:aws:iam::aws:policy/AmazonEKSServicePolicy'
+#      - 'arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy'
+#      - 'arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly'
+#      - 'arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy'
+#  environment:
+#    AWS_ACCESS_KEY_ID: "{{aws_access_key}}"
+#    AWS_SECRET_ACCESS_KEY: "{{aws_secret_key}}"
+#  tags:
+#   - create_eks_worker
+#
+#- name: Gather IAM Role details
+#  iam_role_facts:
+#    name: "{{eks.iam_role}}"
+#  register: iam_role_details
+#  environment:
+#    AWS_ACCESS_KEY_ID: "{{aws_access_key}}"
+#    AWS_SECRET_ACCESS_KEY: "{{aws_secret_key}}"
+#  tags:
+#   - create_eks_worker
+#
+#- name: Print IAM Role details
+#  debug:
+#    msg: "{{iam_role_details}}"
 
-- name: Create IAM Role
-  iam_role:
-    name: "{{eks.iam_role}}"
-    description: IAM Role for EKS operations
-    state: present
-    assume_role_policy_document:
-      Version: "2012-10-17"
-      Statement:
-        - Effect: Allow
-          Action: 'sts:AssumeRole'
-          Principal:
-            Service: eks.amazonaws.com
-    managed_policy:
-      - 'arn:aws:iam::aws:policy/AmazonEKSClusterPolicy'
-      - 'arn:aws:iam::aws:policy/AmazonEKSServicePolicy'
-      - 'arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy'
-      - 'arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly'
-      - 'arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy'
+- name: Gather EKS nodegroup Security Group
+  ec2_group_facts:
+    filters:
+      group-name:
+        - "{{nodegroup.sg_name}}"
+  register: nodegroup_sg_name
   environment:
     AWS_ACCESS_KEY_ID: "{{aws_access_key}}"
     AWS_SECRET_ACCESS_KEY: "{{aws_secret_key}}"
   tags:
    - create_eks_worker
 
-- name: Gather IAM Role details
-  iam_role_facts:
-    name: "{{eks.iam_role}}"
-  register: iam_role_details
-  environment:
-    AWS_ACCESS_KEY_ID: "{{aws_access_key}}"
-    AWS_SECRET_ACCESS_KEY: "{{aws_secret_key}}"
-  tags:
-   - create_eks_worker
-
-- name: Print IAM Role details
+- name: Print nodegroup Security Group details
   debug:
-    msg: "{{iam_role_details}}"
+    msg: "{{nodegroup_sg_name}}"
 

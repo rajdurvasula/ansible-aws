@@ -75,7 +75,7 @@
   set_fact:
     subnet3_id: "{{subnet_details.subnets[0].id}}"
 
-- name: Provision EKS Cluster
+- name: Provision EKS Cluster and await ACTIVE status
   aws_eks_cluster:
     name: "{{eks_cluster_name}}"
     version: "{{eks.kubernetes_version}}"
@@ -86,6 +86,8 @@
       - "{{subnet3_id}}"
     security_groups:
       - "{{controlplane_sg_details.group_id}}"
+    wait: yes
+    wait_timeout: 1200
   environment:
     AWS_ACCESS_KEY_ID: "{{aws_access_key}}"
     AWS_SECRET_ACCESS_KEY: "{{aws_secret_key}}"
@@ -93,7 +95,9 @@
   tags:
     - create_eks_cluster
 
-- name: Print EKS Cluster output
+- name: Print EKS Cluster details
   debug:
     msg: "{{eks_cluster_details}}"
+  tags:
+    - create_eks_cluster
 

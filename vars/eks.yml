@@ -3,16 +3,16 @@ eks_cluster_name: "rd-eks"
 bootstrap_args: ""
 
 eks:
-  iam_role: rd-eks-role1
+  iam_role: "{{eks_cluster_name}}-role1"
   kubernetes_version: "1.11"
   service_role_arn: arn:aws:iam::466323227181:role/rajEKSServiceRole
   control_plane:
-    sg_name: eks-vpc-ControlPlaneSG
+    sg_name: "{{eks_cluster_name}}-ControlPlaneSG"
 
 nodegroup:
   name: "{{eks_cluster_name}}-nodegroup"
   image_id: "ami-098fb7e9b507904e7"
   instance_type: t3.medium
-  sg_name: eks-vpc-NodeGroupSG
+  sg_name: "eks-vpc-NodeGroupSG"
   volume_type: gp2
   volume_size: 20

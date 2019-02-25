@@ -109,13 +109,24 @@
         rule_desc: Allow pods running extension API servers on port 443 to receive communication from cluster control plane
     tags:
       Name: "{{nodegroup.sg_name}}"
-  register: nodegroup_sg_details
   environment:
     AWS_ACCESS_KEY_ID: "{{aws_access_key}}"
     AWS_SECRET_ACCESS_KEY: "{{aws_secret_key}}"
   tags:
    - create_eks_worker
 
+- name: Gather EKS nodegroup Security Group
+  ec2_group_facts:
+    filters:
+      group-name:
+        - "{{nodegroup.sg_name}}"
+  register: nodegroup_sg_name
+  environment:
+    AWS_ACCESS_KEY_ID: "{{aws_access_key}}"
+    AWS_SECRET_ACCESS_KEY: "{{aws_secret_key}}"
+  tags:
+   - create_eks_worker
+ 
 - name: Update EKS Control Plane security group
   ec2_group:
     name: "{{eks.control_plane.sg_name}}"
@@ -151,7 +162,7 @@
     image_id: "{{nodegroup.image_id}}"
     key_name: "{{key_pair_name}}"
     region: "{{region}}"
-    security_groups: [ "{{nodegroup.sg_name}}" ]
+    security_groups: [ "{{nodegroup_sg_name.security_groups[0].group_id}}" ]
     instance_type: "{{nodegroup.instance_type}}"
     instance_profile_name: "{{iam_role_details.iam_roles[0].instance_profiles[0].arn}}"
     assign_public_ip: yes
